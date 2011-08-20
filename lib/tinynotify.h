@@ -68,29 +68,20 @@ typedef struct _notify_session* NotifySession;
 
 /**
  * NotifyError
- * @NOTIFY_ERROR_NO_ERROR: no error
- * @NOTIFY_ERROR_DBUS_CONNECT: unable to connect to the session bus
- * @NOTIFY_ERROR_DBUS_SEND: unable to send the notification
- * @NOTIFY_ERROR_INVALID_REPLY: invalid reply was received from server
- * @NOTIFY_ERROR_NO_NOTIFICATION_ID: no notification-id set in #Notification
  *
  * A tinynotify error code.
  *
- * Note that %NOTIFY_ERROR_NO_ERROR is guaranteed to be always 0. Thus, one can
- * use this enum as a boolean for error indication.
+ * Note that %NOTIFY_ERROR_NO_ERROR is guaranteed to be always false. Thus, one
+ * can use this type as a boolean for error indication.
  */
 
-typedef enum {
-	NOTIFY_ERROR_NO_ERROR = 0,
+typedef const struct _notify_error* NotifyError;
 
-	NOTIFY_ERROR_DBUS_CONNECT,
-	NOTIFY_ERROR_DBUS_SEND,
-	NOTIFY_ERROR_INVALID_REPLY,
-	NOTIFY_ERROR_NO_NOTIFICATION_ID,
-
-	/*< private >*/
-	NOTIFY_ERROR_COUNT
-} NotifyError;
+extern const NotifyError NOTIFY_ERROR_NO_ERROR;
+extern const NotifyError NOTIFY_ERROR_DBUS_CONNECT;
+extern const NotifyError NOTIFY_ERROR_DBUS_SEND;
+extern const NotifyError NOTIFY_ERROR_INVALID_REPLY;
+extern const NotifyError NOTIFY_ERROR_NO_NOTIFICATION_ID;
 
 /**
  * notify_session_new

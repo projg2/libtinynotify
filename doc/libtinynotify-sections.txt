@@ -13,6 +13,11 @@ notify_session_set_app_icon
 <SECTION>
 <FILE>NotifyError</FILE>
 NotifyError
+NOTIFY_ERROR_DBUS_CONNECT
+NOTIFY_ERROR_DBUS_SEND
+NOTIFY_ERROR_INVALID_REPLY
+NOTIFY_ERROR_NO_ERROR
+NOTIFY_ERROR_NO_NOTIFICATION_ID
 notify_session_get_error
 notify_session_get_error_message
 </SECTION>

@@ -33,13 +33,20 @@ struct _notify_session {
 	char* error_details;
 };
 
-static const char* const _error_messages[NOTIFY_ERROR_COUNT] = {
-	"No error",
-	"Connecting to D-Bus failed: %s",
-	"Sending message over D-Bus failed: %s",
-	"Invalid reply received: %s",
-	"No notification-id is specified"
+struct _notify_error {
+	const char* const message;
 };
+
+const NotifyError NOTIFY_ERROR_NO_ERROR = NULL;
+
+static const struct _notify_error _error_dbus_connect = { "Connecting to D-Bus failed: %s" };
+const NotifyError NOTIFY_ERROR_DBUS_CONNECT = &_error_dbus_connect;
+static const struct _notify_error _error_dbus_send = { "Sending message over D-Bus failed: %s" };
+const NotifyError NOTIFY_ERROR_DBUS_SEND = &_error_dbus_send;
+static const struct _notify_error _error_invalid_reply = { "Invalid reply received: %s" };
+const NotifyError NOTIFY_ERROR_INVALID_REPLY = &_error_invalid_reply;
+static const struct _notify_error _error_no_notification_id = { "No notification-id is specified" };
+const NotifyError NOTIFY_ERROR_NO_NOTIFICATION_ID = &_error_no_notification_id;
 
 static NotifyError _notify_session_set_error(
 		NotifySession s,
@@ -49,8 +56,11 @@ static NotifyError _notify_session_set_error(
 	if (s->error_details)
 		free(s->error_details);
 	s->error = new_error;
-	_mem_assert(asprintf(&s->error_details, _error_messages[new_error],
-			error_details) != -1);
+	if (!new_error)
+		_mem_assert(s->error_details = strdup("No error"));
+	else
+		_mem_assert(asprintf(&s->error_details, new_error->message,
+				error_details) != -1);
 
 	return new_error;
 }
