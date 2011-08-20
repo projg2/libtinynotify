@@ -20,7 +20,6 @@
 		<xi:include href="xml/NotifySession.xml"/>
 		<xi:include href="xml/NotifyError.xml"/>
 		<xi:include href="xml/Notification.xml"/>
-		<xi:include href="xml/libtinynotify-cli.xml"/>
 	</chapter>
 
 	<index id="api-index-full">

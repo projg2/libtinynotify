@@ -17,18 +17,6 @@ AC_CHECK_FUNCS([strdup asprintf vasprintf],, [
 ])
 PKG_CHECK_MODULES([DBUS], [dbus-1])
 
-AC_ARG_ENABLE([cli],
-	[AS_HELP_STRING([--disable-cli],
-		[Disable CLI support])])
-AS_IF([test x"$enable_cli" != x"no"], [
-	AC_CHECK_FUNC([getopt],, [
-		AC_MSG_WARN([getopt() not found, disabling CLI])
-		enable_cli=no
-	])
-	AC_CHECK_FUNCS([getopt_long])
-])
-AM_CONDITIONAL([ENABLE_CLI], [test x"$enable_cli" != x"no"])
-
 AC_ARG_ENABLE([debug],
 	[AS_HELP_STRING([--disable-debug],
 		[Disable debugging asserts])])
@@ -37,5 +25,5 @@ AS_IF([test x"$enable_debug" = x"no"], [
 ])
 
 AC_CONFIG_HEADER([config.h])
-AC_CONFIG_FILES([Makefile doc/Makefile libtinynotify.pc libtinynotify-cli.pc])
+AC_CONFIG_FILES([Makefile doc/Makefile libtinynotify.pc])
 AC_OUTPUT
