@@ -20,6 +20,7 @@ NOTIFY_ERROR_INVALID_REPLY
 NOTIFY_ERROR_NO_NOTIFICATION_ID
 notify_session_get_error
 notify_session_get_error_message
+notify_session_set_error
 </SECTION>
 <SECTION>
 <FILE>Notification</FILE>

@@ -33,22 +33,18 @@ struct _notify_session {
 	char* error_details;
 };
 
-struct _notify_error {
-	const char* const message;
-};
-
 const NotifyError NOTIFY_ERROR_NO_ERROR = NULL;
 
-static const struct _notify_error _error_dbus_connect = { "Connecting to D-Bus failed: %s" };
+static const struct notify_error _error_dbus_connect = { "Connecting to D-Bus failed: %s" };
 const NotifyError NOTIFY_ERROR_DBUS_CONNECT = &_error_dbus_connect;
-static const struct _notify_error _error_dbus_send = { "Sending message over D-Bus failed: %s" };
+static const struct notify_error _error_dbus_send = { "Sending message over D-Bus failed: %s" };
 const NotifyError NOTIFY_ERROR_DBUS_SEND = &_error_dbus_send;
-static const struct _notify_error _error_invalid_reply = { "Invalid reply received: %s" };
+static const struct notify_error _error_invalid_reply = { "Invalid reply received: %s" };
 const NotifyError NOTIFY_ERROR_INVALID_REPLY = &_error_invalid_reply;
-static const struct _notify_error _error_no_notification_id = { "No notification-id is specified" };
+static const struct notify_error _error_no_notification_id = { "No notification-id is specified" };
 const NotifyError NOTIFY_ERROR_NO_NOTIFICATION_ID = &_error_no_notification_id;
 
-static NotifyError _notify_session_set_error(
+NotifyError notify_session_set_error(
 		NotifySession s,
 		NotifyError new_error,
 		char *error_details)
@@ -74,7 +70,7 @@ NotifySession notify_session_new(const char* app_name, const char* app_icon) {
 	s->app_icon = NULL;
 	s->error_details = NULL;
 
-	_notify_session_set_error(s, NOTIFY_ERROR_NO_ERROR, NULL);
+	notify_session_set_error(s, NOTIFY_ERROR_NO_ERROR, NULL);
 	notify_session_set_app_name(s, app_name);
 	notify_session_set_app_icon(s, app_icon);
 	return s;
@@ -109,12 +105,12 @@ NotifyError notify_session_connect(NotifySession s) {
 		if (!s->conn) {
 			char *err_msg = strdup(err.message);
 			dbus_error_free(&err);
-			return _notify_session_set_error(s, NOTIFY_ERROR_DBUS_CONNECT, err_msg);
+			return notify_session_set_error(s, NOTIFY_ERROR_DBUS_CONNECT, err_msg);
 		} else
 			dbus_connection_set_exit_on_disconnect(s->conn, FALSE);
 	}
 
-	return _notify_session_set_error(s, NOTIFY_ERROR_NO_ERROR, NULL);
+	return notify_session_set_error(s, NOTIFY_ERROR_NO_ERROR, NULL);
 }
 
 void notify_session_disconnect(NotifySession s) {
@@ -124,7 +120,7 @@ void notify_session_disconnect(NotifySession s) {
 		s->conn = NULL;
 	}
 
-	_notify_session_set_error(s, NOTIFY_ERROR_NO_ERROR, NULL);
+	notify_session_set_error(s, NOTIFY_ERROR_NO_ERROR, NULL);
 }
 
 static void _property_assign_str(char** prop, const char* newval) {
@@ -360,7 +356,7 @@ static NotifyError notification_update_va(Notification n, NotifySession s, va_li
 		free(f_summary);
 		free(f_body);
 	}
-	return _notify_session_set_error(s, ret, err_msg);
+	return notify_session_set_error(s, ret, err_msg);
 }
 
 static NotifyError notification_send_va(Notification n, NotifySession s, va_list ap) {
@@ -400,7 +396,7 @@ NotifyError notification_close(Notification n, NotifySession s) {
 	dbus_uint32_t id = n->message_id;
 
 	if (id == NOTIFICATION_NO_NOTIFICATION_ID)
-		return _notify_session_set_error(s, NOTIFY_ERROR_NO_NOTIFICATION_ID, NULL);
+		return notify_session_set_error(s, NOTIFY_ERROR_NO_NOTIFICATION_ID, NULL);
 
 	if (notify_session_connect(s))
 		return notify_session_get_error(s);
@@ -441,7 +437,7 @@ NotifyError notification_close(Notification n, NotifySession s) {
 	}
 
 	dbus_message_unref(msg);
-	return _notify_session_set_error(s, ret, err_msg);
+	return notify_session_set_error(s, ret, err_msg);
 }
 
 void notification_set_formatting(Notification n, int formatting) {

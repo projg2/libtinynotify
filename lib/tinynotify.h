@@ -75,7 +75,11 @@ typedef struct _notify_session* NotifySession;
  * can use this type as a boolean for error indication.
  */
 
-typedef const struct _notify_error* NotifyError;
+struct notify_error {
+	const char* const message;
+};
+
+typedef const struct notify_error* NotifyError;
 
 extern const NotifyError NOTIFY_ERROR_NO_ERROR;
 extern const NotifyError NOTIFY_ERROR_DBUS_CONNECT;
@@ -120,6 +124,23 @@ void notify_session_free(NotifySession session);
  * Returns: positive #NotifyError or %NOTIFY_ERROR_NO_ERROR if no error
  */
 NotifyError notify_session_get_error(NotifySession session);
+
+/**
+ * notify_session_set_error
+ * @session: session to operate on
+ * @new_error: new error code
+ * @error_details: detailed error message (or %NULL if not needed)
+ *
+ * Set a new error in session @session.
+ *
+ * Note: this function is mostly intended for internal use in submodules.
+ *
+ * Returns: same value as @new_error, for convenience.
+ */
+NotifyError notify_session_set_error(
+		NotifySession session,
+		NotifyError new_error,
+		char *error_details);
 
 /**
  * notify_session_get_error_message
