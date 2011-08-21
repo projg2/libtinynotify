@@ -81,10 +81,38 @@ struct notify_error {
 
 typedef const struct notify_error* NotifyError;
 
+/**
+ * NOTIFY_ERROR_NO_ERROR
+ *
+ * A constant denoting that no error occured.
+ */
 extern const NotifyError NOTIFY_ERROR_NO_ERROR;
+
+/**
+ * NOTIFY_ERROR_DBUS_CONNECT
+ *
+ * An error occuring while establishing the D-Bus connection.
+ */
 extern const NotifyError NOTIFY_ERROR_DBUS_CONNECT;
+/**
+ * NOTIFY_ERROR_DBUS_SEND
+ *
+ * An error occuring while trying to send the D-Bus message.
+ */
 extern const NotifyError NOTIFY_ERROR_DBUS_SEND;
+/**
+ * NOTIFY_ERROR_INVALID_REPLY
+ *
+ * An error denoting that the return value from a D-Bus method call is invalid.
+ */
 extern const NotifyError NOTIFY_ERROR_INVALID_REPLY;
+/**
+ * NOTIFY_ERROR_NO_NOTIFICATION_ID
+ *
+ * An error denoting that the #Notification has no ID associated while it is
+ * necessary for the function to proceed (e.g. when using notification_close()
+ * on an unsubmitted notification).
+ */
 extern const NotifyError NOTIFY_ERROR_NO_NOTIFICATION_ID;
 
 /**
