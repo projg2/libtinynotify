@@ -44,19 +44,20 @@ const NotifyError NOTIFY_ERROR_INVALID_REPLY = &_error_invalid_reply;
 static const struct notify_error _error_no_notification_id = { "No notification-id is specified" };
 const NotifyError NOTIFY_ERROR_NO_NOTIFICATION_ID = &_error_no_notification_id;
 
-NotifyError notify_session_set_error(
-		NotifySession s,
-		NotifyError new_error,
-		char *error_details)
+NotifyError notify_session_set_error(NotifySession s, NotifyError new_error, ...)
 {
+	va_list ap;
+
 	if (s->error_details)
 		free(s->error_details);
 	s->error = new_error;
 	if (!new_error)
 		_mem_assert(s->error_details = strdup("No error"));
-	else
-		_mem_assert(asprintf(&s->error_details, new_error->message,
-				error_details) != -1);
+	else {
+		va_start(ap, new_error);
+		_mem_assert(vasprintf(&s->error_details, new_error->message, ap) != -1);
+		va_end(ap);
+	}
 
 	return new_error;
 }
@@ -70,7 +71,7 @@ NotifySession notify_session_new(const char* app_name, const char* app_icon) {
 	s->app_icon = NULL;
 	s->error_details = NULL;
 
-	notify_session_set_error(s, NOTIFY_ERROR_NO_ERROR, NULL);
+	notify_session_set_error(s, NOTIFY_ERROR_NO_ERROR);
 	notify_session_set_app_name(s, app_name);
 	notify_session_set_app_icon(s, app_icon);
 	return s;
@@ -110,7 +111,7 @@ NotifyError notify_session_connect(NotifySession s) {
 			dbus_connection_set_exit_on_disconnect(s->conn, FALSE);
 	}
 
-	return notify_session_set_error(s, NOTIFY_ERROR_NO_ERROR, NULL);
+	return notify_session_set_error(s, NOTIFY_ERROR_NO_ERROR);
 }
 
 void notify_session_disconnect(NotifySession s) {
@@ -120,7 +121,7 @@ void notify_session_disconnect(NotifySession s) {
 		s->conn = NULL;
 	}
 
-	notify_session_set_error(s, NOTIFY_ERROR_NO_ERROR, NULL);
+	notify_session_set_error(s, NOTIFY_ERROR_NO_ERROR);
 }
 
 static void _property_assign_str(char** prop, const char* newval) {
@@ -396,7 +397,7 @@ NotifyError notification_close(Notification n, NotifySession s) {
 	dbus_uint32_t id = n->message_id;
 
 	if (id == NOTIFICATION_NO_NOTIFICATION_ID)
-		return notify_session_set_error(s, NOTIFY_ERROR_NO_NOTIFICATION_ID, NULL);
+		return notify_session_set_error(s, NOTIFY_ERROR_NO_NOTIFICATION_ID);
 
 	if (notify_session_connect(s))
 		return notify_session_get_error(s);

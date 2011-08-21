@@ -129,7 +129,7 @@ NotifyError notify_session_get_error(NotifySession session);
  * notify_session_set_error
  * @session: session to operate on
  * @new_error: new error code
- * @error_details: detailed error message (or %NULL if not needed)
+ * @...: additional arguments for error message format string
  *
  * Set a new error in session @session.
  *
@@ -137,10 +137,7 @@ NotifyError notify_session_get_error(NotifySession session);
  *
  * Returns: same value as @new_error, for convenience.
  */
-NotifyError notify_session_set_error(
-		NotifySession session,
-		NotifyError new_error,
-		char *error_details);
+NotifyError notify_session_set_error(NotifySession session, NotifyError new_error, ...);
 
 /**
  * notify_session_get_error_message
