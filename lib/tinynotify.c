@@ -225,6 +225,16 @@ void notification_set_category(Notification n, const char* category) {
 	_property_assign_str(&n->category, category);
 }
 
+static int _dual_vasprintf(char **outa, const char *fstra,
+		char **outb, const char *fstrb, va_list ap) {
+	/* XXX: temporary, replace with something more portable */
+	int reta, retb;
+
+	reta = vasprintf(outa, fstra, ap);
+	retb = vasprintf(outb, fstrb, ap);
+	return (reta == -1 || retb == -1 ? -1 : reta + retb);
+}
+
 static void _notification_append_hint(DBusMessageIter* subiter,
 		const char* key, const char* hint_type, const void* hint_val) {
 	DBusMessageIter dictiter, variter;
@@ -270,8 +280,8 @@ static NotifyError notification_update_va(Notification n, NotifySession s, va_li
 		return notify_session_get_error(s);
 
 	if (n->formatting) {
-		_mem_assert(vasprintf(&f_summary, summary, ap) != -1);
-		_mem_assert(vasprintf(&f_body, body, ap) != -1);
+		_mem_assert(_dual_vasprintf(&f_summary, summary,
+					&f_body, body, ap) != -1);
 
 		summary = f_summary;
 		body = f_body;
