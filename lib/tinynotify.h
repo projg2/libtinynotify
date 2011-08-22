@@ -221,6 +221,8 @@ extern const char* const NOTIFY_SESSION_NO_APP_NAME;
  *
  * Set the default application name for notifications sent through this session.
  *
+ * This should be the formal application name rather than an ID.
+ *
  * If %NOTIFY_SESSION_NO_APP_NAME is passed, the default application name will
  * be cleared. Otherwise, the given string will be copied to #NotifySession.
  */
@@ -240,6 +242,9 @@ extern const char* const NOTIFY_SESSION_NO_APP_ICON;
  *
  * Set the default application icon for notifications sent through this
  * session.
+ *
+ * The value should be either a name in freedesktop.org-compliant icon scheme,
+ * or a file:// URI.
  *
  * If %NOTIFY_SESSION_NO_APP_ICON is passed, the default application icon will
  * be cleared. Otherwise, the given string will be copied to #NotifySession.
@@ -350,6 +355,9 @@ extern const char* const NOTIFICATION_NO_APP_ICON;
  * @app_icon: a new icon name
  *
  * Set the application icon for a single notification.
+ *
+ * The value should be either a name in freedesktop.org-compliant icon scheme,
+ * or a file:// URI.
  *
  * If %NOTIFICATION_DEFAULT_APP_ICON is passed, the notification will be reset
  * to use default app icon specified in #NotifySession (if one is set). If
