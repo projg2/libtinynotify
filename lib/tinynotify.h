@@ -461,7 +461,7 @@ void notification_set_category(Notification notification, const char* category);
  * and arguments to the body format string should immediately follow.
  *
  * Note that in the latter case, both argument lists share the same namespace.
- * Thus, if positional placeholders (%1$s) are used, they have to be used
+ * Thus, if positional placeholders (\%1$s) are used, they have to be used
  * in both strings, and have to refer to the positions relative to the start
  * of the argument list to the first format string.
  *
