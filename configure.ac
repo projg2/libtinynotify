@@ -6,7 +6,7 @@ AM_INIT_AUTOMAKE([1.6 foreign dist-bzip2 no-dependencies -Wall])
 
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES])
 
-AC_PROG_CC_C99
+AC_PROG_CC_STDC
 AM_PROG_CC_C_O
 AC_USE_SYSTEM_EXTENSIONS
 LT_INIT([disable-static])

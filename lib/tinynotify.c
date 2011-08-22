@@ -225,6 +225,14 @@ void notification_set_category(Notification n, const char* category) {
 	_property_assign_str(&n->category, category);
 }
 
+#ifndef va_copy
+#	ifdef __va_copy
+#		define va_copy __va_copy
+#	else
+#		define va_copy(a, b) memcpy(&a, &b, sizeof(va_list))
+#	endif
+#endif
+
 static int _dual_vasprintf(char **outa, const char *fstra,
 		const char** outb, const char *fstrb, va_list ap) {
 	int first_len, ret;
