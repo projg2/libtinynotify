@@ -236,7 +236,7 @@ void notification_set_category(Notification n, const char* category) {
 static int _dual_vasprintf(char **outa, const char *fstra,
 		const char** outb, const char *fstrb, va_list ap) {
 	int first_len, ret;
-	va_list first_ap, full_ap;
+	va_list first_ap;
 	char *full_fstr;
 
 	va_copy(first_ap, ap);
@@ -246,11 +246,7 @@ static int _dual_vasprintf(char **outa, const char *fstra,
 
 	if (asprintf(&full_fstr, "%s\1%s", fstra, fstrb) == -1)
 		return -1;
-
-	va_copy(full_ap, ap);
-	ret = vasprintf(outa, full_fstr, full_ap);
-	va_end(full_ap);
-
+	ret = vasprintf(outa, full_fstr, ap);
 	free(full_fstr);
 
 	if (ret == -1)
