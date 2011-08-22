@@ -226,13 +226,34 @@ void notification_set_category(Notification n, const char* category) {
 }
 
 static int _dual_vasprintf(char **outa, const char *fstra,
-		char **outb, const char *fstrb, va_list ap) {
-	/* XXX: temporary, replace with something more portable */
-	int reta, retb;
+		const char** outb, const char *fstrb, va_list ap) {
+	int first_len, ret;
+	va_list first_ap, full_ap;
+	char *full_fstr;
 
-	reta = vasprintf(outa, fstra, ap);
-	retb = vasprintf(outb, fstrb, ap);
-	return (reta == -1 || retb == -1 ? -1 : reta + retb);
+	va_copy(first_ap, ap);
+	first_len = vsnprintf(NULL, 0, fstra, first_ap);
+	va_end(first_ap);
+	assert(first_len >= 0);
+
+	if (asprintf(&full_fstr, "%s\1%s", fstra, fstrb) == -1)
+		return -1;
+
+	va_copy(full_ap, ap);
+	ret = vasprintf(outa, full_fstr, full_ap);
+	va_end(full_ap);
+
+	free(full_fstr);
+
+	if (ret == -1)
+		return -1;
+	assert(ret >= first_len);
+
+	assert((*outa)[first_len] == 1);
+	(*outa)[first_len] = 0;
+	*outb = &(*outa)[first_len+1];
+
+	return ret;
 }
 
 static void _notification_append_hint(DBusMessageIter* subiter,
@@ -262,7 +283,7 @@ static void _notification_append_hint(DBusMessageIter* subiter,
 static NotifyError notification_update_va(Notification n, NotifySession s, va_list ap) {
 	NotifyError ret;
 	char *err_msg;
-	char *f_summary, *f_body;
+	char *f_summary;
 
 	DBusMessage *msg, *reply;
 	DBusMessageIter iter, subiter;
@@ -281,10 +302,9 @@ static NotifyError notification_update_va(Notification n, NotifySession s, va_li
 
 	if (n->formatting) {
 		_mem_assert(_dual_vasprintf(&f_summary, summary,
-					&f_body, body, ap) != -1);
+					&body, body, ap) != -1);
 
 		summary = f_summary;
-		body = f_body;
 	}
 
 	_mem_assert(msg = dbus_message_new_method_call("org.freedesktop.Notifications",
@@ -363,10 +383,8 @@ static NotifyError notification_update_va(Notification n, NotifySession s, va_li
 	}
 
 	dbus_message_unref(msg);
-	if (n->formatting) {
+	if (n->formatting)
 		free(f_summary);
-		free(f_body);
-	}
 	return notify_session_set_error(s, ret, err_msg);
 }
 
