@@ -16,7 +16,8 @@ AC_CHECK_FUNCS([strdup snprintf],, [
 	AC_MSG_ERROR([One of the required library functions can not be found])
 ])
 AC_SEARCH_LIBS([vasprintf], [strl],, [
-	AC_MSG_ERROR([One of the required library functions can not be found])
+	AC_MSG_ERROR([One of the required library functions can not be found.
+You may install libstrl (http://ohnopub.net/~ohnobinki/libstrl/) to get a compat.])
 ])
 
 AS_IF([test x"$ac_cv_search_vasprintf" = x"-lstrl"], [
