@@ -12,9 +12,17 @@ AC_USE_SYSTEM_EXTENSIONS
 LT_INIT([disable-static])
 GTK_DOC_CHECK([1.15])
 
-AC_CHECK_FUNCS([strdup asprintf vasprintf],, [
-	AC_MSG_ERROR([One of the required library functions was not found])
+AC_CHECK_FUNCS([strdup snprintf],, [
+	AC_MSG_ERROR([One of the required library functions can not be found])
 ])
+AC_SEARCH_LIBS([vasprintf], [strl],, [
+	AC_MSG_ERROR([One of the required library functions can not be found])
+])
+
+AS_IF([test x"$ac_cv_search_vasprintf" = x"-lstrl"], [
+	AC_DEFINE([HAVE_LIBSTRL], [1], [Define if we need to use libstrl])
+])
+
 PKG_CHECK_MODULES([DBUS], [dbus-1])
 
 AC_ARG_ENABLE([debug],
