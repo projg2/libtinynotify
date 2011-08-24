@@ -363,7 +363,7 @@ static NotifyError notification_update_va(Notification n, NotifySession s, va_li
 
 	dbus_error_init(&err);
 	reply = dbus_connection_send_with_reply_and_block(s->conn,
-			msg, 5000 /* XXX */, &err);
+			msg, DBUS_TIMEOUT_INFINITE, &err);
 
 	assert(!reply == dbus_error_is_set(&err));
 	if (!reply) {
