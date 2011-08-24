@@ -100,6 +100,9 @@ const char* notify_session_get_error_message(NotifySession s) {
 }
 
 NotifyError notify_session_connect(NotifySession s) {
+	if (s->conn && !dbus_connection_get_is_connected(s->conn))
+		notify_session_disconnect(s);
+
 	if (!s->conn) {
 		DBusError err;
 

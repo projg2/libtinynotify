@@ -200,7 +200,9 @@ void notify_session_disconnect(NotifySession session);
  * the connection will be established when sending the first notification.
  *
  * If a connection is established already, this function does nothing
- * and returns %NOTIFY_ERROR_NO_ERROR.
+ * and returns %NOTIFY_ERROR_NO_ERROR. If the connection was established
+ * and got disconnected for some reason (e.g. by the remote end), this function
+ * will try to re-establish it transparently.
  *
  * Returns: a #NotifyError or %NOTIFY_ERROR_NO_ERROR if connection succeeds.
  * For additional error details, see notify_session_get_error_message().
