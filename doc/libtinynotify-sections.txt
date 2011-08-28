@@ -49,6 +49,7 @@ notification_set_body
 </SECTION>
 <SECTION>
 <FILE>NotifyEvent</FILE>
+NOTIFICATION_CLOSED_BY_DISCONNECT
 NotificationCloseCallback
 notification_bind_close_callback
 </SECTION>

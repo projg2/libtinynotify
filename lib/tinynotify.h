@@ -578,6 +578,19 @@ void notification_set_body(Notification notification, const char* body);
  */
 
 /**
+ * NOTIFICATION_CLOSED_BY_DISCONNECT
+ *
+ * A constant passed to #NotificationCloseCallback when the close event is
+ * emitted because of the #NotifySession being disconnected.
+ *
+ * Note that this doesn't actually mean the notification was closed. It just
+ * means that libtinynotify didn't receive a NotificationClosed signal before
+ * the connection was interrupted. The notification may still be open, or be
+ * long gone (if daemon failed to send the signal).
+ */
+extern const unsigned char NOTIFICATION_CLOSED_BY_DISCONNECT;
+
+/**
  * NotificationCloseCallback
  * @notification: the notification which was closed
  * @close_reason: reason for which the notification was closed

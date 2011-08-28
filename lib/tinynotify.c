@@ -27,6 +27,11 @@ void _mem_check(int res) {
 	}
 }
 
+struct _notification_list {
+	Notification n;
+	struct _notification_list* next;
+};
+
 struct _notify_session {
 	DBusConnection *conn;
 
@@ -35,6 +40,26 @@ struct _notify_session {
 
 	NotifyError error;
 	char* error_details;
+
+	/* notifications with event callbacks */
+	struct _notification_list* notifications;
+};
+
+struct _notification {
+	char* summary;
+	char* body;
+	int formatting;
+
+	NotificationCloseCallback close_callback;
+	void* close_data;
+
+	dbus_int32_t expire_timeout;
+	NotificationUrgency urgency;
+	char* category;
+
+	char* app_icon;
+
+	dbus_uint32_t message_id;
 };
 
 const NotifyError NOTIFY_ERROR_NO_ERROR = NULL;
@@ -74,6 +99,7 @@ NotifySession notify_session_new(const char* app_name, const char* app_icon) {
 	s->app_name = NULL;
 	s->app_icon = NULL;
 	s->error_details = NULL;
+	s->notifications = NULL;
 
 	notify_session_set_error(s, NOTIFY_ERROR_NO_ERROR);
 	notify_session_set_app_name(s, app_name);
@@ -83,6 +109,7 @@ NotifySession notify_session_new(const char* app_name, const char* app_icon) {
 
 void notify_session_free(NotifySession s) {
 	notify_session_disconnect(s);
+	assert(!s->notifications);
 
 	if (s->error_details)
 		free(s->error_details);
@@ -121,8 +148,41 @@ NotifyError notify_session_connect(NotifySession s) {
 	return notify_session_set_error(s, NOTIFY_ERROR_NO_ERROR);
 }
 
+static void _notify_session_add_notification(NotifySession s, Notification n) {
+	struct _notification_list *nl;
+
+	_mem_assert(nl = malloc(sizeof(*nl)));
+	nl->n = n;
+	nl->next = s->notifications;
+	s->notifications = nl;
+}
+
+static void _emit_closed(NotifySession s, Notification n, unsigned char reason) {
+	struct _notification_list **prev;
+
+	if (n->close_callback)
+		n->close_callback(n, reason, n->close_data);
+
+	for (prev = &s->notifications; *prev; prev = &(*prev)->next) {
+		struct _notification_list *n_l = *prev;
+
+		if (n_l->n == n) {
+			*prev = n_l->next;
+			free(n_l);
+			return;
+		}
+	}
+
+	assert("reached if _emit_closed() fails to remove the notification");
+}
+
 void notify_session_disconnect(NotifySession s) {
 	if (s->conn) {
+		struct _notification_list **n = &s->notifications;
+
+		while (*n)
+			_emit_closed(s, (*n)->n, NOTIFICATION_CLOSED_BY_DISCONNECT);
+
 		dbus_connection_close(s->conn);
 		dbus_connection_unref(s->conn);
 		s->conn = NULL;
@@ -151,23 +211,6 @@ const char* const NOTIFY_SESSION_NO_APP_ICON = NULL;
 void notify_session_set_app_icon(NotifySession s, const char* app_icon) {
 	_property_assign_str(&s->app_icon, app_icon);
 }
-
-struct _notification {
-	char* summary;
-	char* body;
-	int formatting;
-
-	NotificationCloseCallback close_callback;
-	void* close_data;
-
-	dbus_int32_t expire_timeout;
-	NotificationUrgency urgency;
-	char* category;
-
-	char* app_icon;
-
-	dbus_uint32_t message_id;
-};
 
 static const dbus_uint32_t NOTIFICATION_NO_NOTIFICATION_ID = 0;
 
@@ -390,6 +433,8 @@ static NotifyError notification_update_va(Notification n, NotifySession s, va_li
 			n->message_id = new_id;
 			err_msg = NULL;
 			ret = NOTIFY_ERROR_NO_ERROR;
+
+			_notify_session_add_notification(s, n);
 		}
 
 		dbus_message_unref(reply);
@@ -398,12 +443,7 @@ static NotifyError notification_update_va(Notification n, NotifySession s, va_li
 	dbus_message_unref(msg);
 	if (n->formatting)
 		free(f_summary);
-	notify_session_set_error(s, ret, err_msg);
-
-	if (n->close_callback)
-		n->close_callback(n, 0, n->close_data);
-
-	return notify_session_get_error(s);
+	return notify_session_set_error(s, ret, err_msg);
 }
 
 static NotifyError notification_send_va(Notification n, NotifySession s, va_list ap) {
@@ -499,6 +539,8 @@ void notification_set_summary(Notification n, const char* summary) {
 void notification_set_body(Notification n, const char* body) {
 	_property_assign_str(&n->body, body);
 }
+
+const unsigned char NOTIFICATION_CLOSED_BY_DISCONNECT = 'D';
 
 void notification_bind_close_callback(Notification n,
 		NotificationCloseCallback callback, void* user_data) {
