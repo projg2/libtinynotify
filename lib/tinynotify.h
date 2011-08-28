@@ -559,4 +559,54 @@ void notification_set_summary(Notification notification, const char* summary);
  */
 void notification_set_body(Notification notification, const char* body);
 
+/**
+ * SECTION: NotifyEvent
+ * @short_description: extended, event-based API
+ * @include: tinynotify.h
+ *
+ * A more advanced functionality of libtinynotify is provided via the so-called
+ * event API.
+ *
+ * The core of the event API are callbacks bound to #Notification -specific
+ * events. When a notification with at least a single callback bound is send
+ * through a particular #NotifySession, the notification becomes associated to
+ * that session and it must not be freed before it is closed.
+ *
+ * Thus, one must either bind to the close event explicitly and use a callback
+ * to free a #Notification afterwards, or ensure to disconnect the associated
+ * #NotifySession first (which guarantees sending the close event).
+ */
+
+/**
+ * NotificationCloseCallback
+ * @notification: the notification which was closed
+ * @close_reason: reason for which the notification was closed
+ * @user_data: additional user data pointer as passed
+ *	to notification_bind_close_callback()
+ *
+ * The callback for notification closed event. It is invoked once and only once
+ * per a single notification_send() call.
+ *
+ * After this event, no more events can be sent from the particular
+ * #Notification until notification_send() or notification_update() is used.
+ * Thus, this event is a good place to inject a simple GC.
+ *
+ * Note: the @close_reason parameter may contain a value not listed in constants
+ * in this section. If it does so, one should assume the reason is unknown.
+ */
+typedef void (*NotificationCloseCallback)(Notification notification,
+		unsigned char close_reason, void* user_data);
+
+/**
+ * notification_bind_close_callback
+ * @notification: notification to operate on
+ * @callback: new callback function, or %NULL to disable
+ * @user_data: additional user data to pass to the callback
+ *
+ * Bind a callback function which will be executed when notification is closed,
+ * or remove a current binding (when @callback is %NULL).
+ */
+void notification_bind_close_callback(Notification notification,
+		NotificationCloseCallback callback, void* user_data);
+
 #endif

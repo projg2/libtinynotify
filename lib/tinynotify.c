@@ -157,8 +157,10 @@ struct _notification {
 	char* body;
 	int formatting;
 
-	dbus_int32_t expire_timeout;
+	NotificationCloseCallback close_callback;
+	void* close_data;
 
+	dbus_int32_t expire_timeout;
 	NotificationUrgency urgency;
 	char* category;
 
@@ -396,7 +398,12 @@ static NotifyError notification_update_va(Notification n, NotifySession s, va_li
 	dbus_message_unref(msg);
 	if (n->formatting)
 		free(f_summary);
-	return notify_session_set_error(s, ret, err_msg);
+	notify_session_set_error(s, ret, err_msg);
+
+	if (n->close_callback)
+		n->close_callback(n, 0, n->close_data);
+
+	return notify_session_get_error(s);
 }
 
 static NotifyError notification_send_va(Notification n, NotifySession s, va_list ap) {
@@ -491,4 +498,10 @@ void notification_set_summary(Notification n, const char* summary) {
 
 void notification_set_body(Notification n, const char* body) {
 	_property_assign_str(&n->body, body);
+}
+
+void notification_bind_close_callback(Notification n,
+		NotificationCloseCallback callback, void* user_data) {
+	n->close_callback = callback;
+	n->close_data = user_data;
 }

@@ -47,3 +47,8 @@ notification_set_formatting
 notification_set_summary
 notification_set_body
 </SECTION>
+<SECTION>
+<FILE>NotifyEvent</FILE>
+NotificationCloseCallback
+notification_bind_close_callback
+</SECTION>
