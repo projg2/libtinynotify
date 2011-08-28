@@ -151,6 +151,12 @@ NotifyError notify_session_connect(NotifySession s) {
 static void _notify_session_add_notification(NotifySession s, Notification n) {
 	struct _notification_list *nl;
 
+	for (nl = s->notifications; nl; nl = nl->next) {
+		/* XXX: maybe we should send some kind of close(reason = replaced)? */
+		if (nl->n == n)
+			return;
+	}
+
 	_mem_assert(nl = malloc(sizeof(*nl)));
 	nl->n = n;
 	nl->next = s->notifications;
