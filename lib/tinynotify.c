@@ -553,3 +553,11 @@ void notification_bind_close_callback(Notification n,
 	n->close_callback = callback;
 	n->close_data = user_data;
 }
+
+const NotifyDispatchStatus NOTIFY_DISPATCH_DONE = NULL;
+extern const int NOTIFY_SESSION_NO_TIMEOUT = -1;
+
+NotifyDispatchStatus notify_session_dispatch(NotifySession session,
+		int timeout) {
+	return NOTIFY_DISPATCH_DONE;
+}

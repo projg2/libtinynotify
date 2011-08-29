@@ -622,4 +622,44 @@ typedef void (*NotificationCloseCallback)(Notification notification,
 void notification_bind_close_callback(Notification notification,
 		NotificationCloseCallback callback, void* user_data);
 
+/**
+ * NotifyDispatchStatus
+ *
+ * A return value from notify_session_dispatch().
+ *
+ * Note that the %NOTIFY_DISPATCH_DONE constant is guaranteed always
+ * to evaluate to a false value. Thus, one can use #NotifyDispatchStatus
+ * as a boolean.
+ */
+typedef const struct _notify_dispatch_status* NotifyDispatchStatus;
+
+/**
+ * NOTIFY_DISPATCH_DONE
+ *
+ * A constant denoting that the notify_session_dispatch() completed
+ * successfully, and there may be more messages to dispatch in the future.
+ */
+extern const NotifyDispatchStatus NOTIFY_DISPATCH_DONE;
+
+/**
+ * NOTIFY_SESSION_NO_TIMEOUT
+ *
+ * A constant for notify_session_dispatch() denoting that the session should
+ * block until a message is received.
+ */
+extern const int NOTIFY_SESSION_NO_TIMEOUT;
+
+/**
+ * notify_session_dispatch
+ * @session: session to operate on
+ * @timeout: max time to block in milliseconds, or %NOTIFY_SESSION_NO_TIMEOUT
+ *
+ * Perform any I/O necessary for D-Bus and dispatch any new messages.
+ *
+ * Return value: %NOTIFY_DISPATCH_DONE (which evaluates to false) unless
+ * no more events are expected to come
+ */
+NotifyDispatchStatus notify_session_dispatch(NotifySession session,
+		int timeout);
+
 #endif

@@ -52,4 +52,8 @@ notification_set_body
 NOTIFICATION_CLOSED_BY_DISCONNECT
 NotificationCloseCallback
 notification_bind_close_callback
+NotifyDispatchStatus
+NOTIFY_DISPATCH_DONE
+NOTIFY_SESSION_NO_TIMEOUT
+notify_session_dispatch
 </SECTION>
