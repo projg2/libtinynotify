@@ -643,6 +643,28 @@ typedef void (*NotificationCloseCallback)(Notification notification,
 		NotifyCloseReason close_reason, void* user_data);
 
 /**
+ * NOTIFICATION_NOOP_ON_CLOSE
+ *
+ * A dummy callback function for notification_bind_close_callback(). It may be
+ * used if one isn't interested in the notification being closed itself but
+ * just wants notify_session_dispatch() to block until all notifications are
+ * closed.
+ */
+extern const NotificationCloseCallback NOTIFICATION_NOOP_ON_CLOSE;
+
+/**
+ * NOTIFICATION_FREE_ON_CLOSE
+ *
+ * A callback function for notification_bind_close_callback() which frees
+ * #Notification as soon as it's closed.
+ *
+ * Note: when using this callback, one must not use the same #Notification
+ * after sending it for the first time as it will become invalid at a random
+ * point in time.
+ */
+extern const NotificationCloseCallback NOTIFICATION_FREE_ON_CLOSE;
+
+/**
  * notification_bind_close_callback
  * @notification: notification to operate on
  * @callback: new callback function, or %NULL to disable

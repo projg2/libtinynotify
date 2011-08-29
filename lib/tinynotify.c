@@ -607,6 +607,16 @@ const NotifyCloseReason NOTIFICATION_CLOSED_BY_EXPIRATION = 'E';
 const NotifyCloseReason NOTIFICATION_CLOSED_BY_USER = 'U';
 const NotifyCloseReason NOTIFICATION_CLOSED_BY_CALLER = 'C';
 
+static void _notification_noop_on_close(Notification n, NotifyCloseReason r, void* user_data) {
+}
+
+static void _notification_free_on_close(Notification n, NotifyCloseReason r, void* user_data) {
+	notification_free(n);
+}
+
+const NotificationCloseCallback NOTIFICATION_NOOP_ON_CLOSE = _notification_noop_on_close;
+const NotificationCloseCallback NOTIFICATION_FREE_ON_CLOSE = _notification_free_on_close;
+
 void notification_bind_close_callback(Notification n,
 		NotificationCloseCallback callback, void* user_data) {
 	n->close_callback = callback;
