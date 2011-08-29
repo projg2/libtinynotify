@@ -55,6 +55,7 @@ notification_bind_close_callback
 NotifyDispatchStatus
 NOTIFY_DISPATCH_DONE
 NOTIFY_DISPATCH_ALL_CLOSED
+NOTIFY_DISPATCH_NOT_CONNECTED
 NOTIFY_SESSION_NO_TIMEOUT
 notify_session_dispatch
 </SECTION>

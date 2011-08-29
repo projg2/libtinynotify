@@ -651,6 +651,18 @@ extern const NotifyDispatchStatus NOTIFY_DISPATCH_DONE;
 extern const NotifyDispatchStatus NOTIFY_DISPATCH_ALL_CLOSED;
 
 /**
+ * NOTIFY_DISPATCH_NOT_CONNECTED
+ *
+ * A constant denoting that the notify_session_dispatch() failed because
+ * the connection is not established (anymore). This could happen also
+ * if the client was disconnected for some reason.
+ *
+ * As disconnect results in sending 'close' event for all open notifications,
+ * this could be treated similar to %NOTIFY_DISPATCH_ALL_CLOSED.
+ */
+extern const NotifyDispatchStatus NOTIFY_DISPATCH_NOT_CONNECTED;
+
+/**
  * NOTIFY_SESSION_NO_TIMEOUT
  *
  * A constant for notify_session_dispatch() denoting that the session should
@@ -664,6 +676,12 @@ extern const int NOTIFY_SESSION_NO_TIMEOUT;
  * @timeout: max time to block in milliseconds, or %NOTIFY_SESSION_NO_TIMEOUT
  *
  * Perform any I/O necessary for D-Bus and dispatch any new messages.
+ *
+ * The return value can be treated as a boolean stating whether more events
+ * are expected, and thus used to terminate the main loop. Note, however, that
+ * if for some reason the notification daemon doesn't send NotificationClosed
+ * signal, the program may deadlock waiting for it. In order to avoid that, one
+ * should use a kind of timeout timer.
  *
  * Return value: %NOTIFY_DISPATCH_DONE (which evaluates to false) unless
  * no more events are expected to come

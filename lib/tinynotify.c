@@ -601,11 +601,17 @@ struct _notify_dispatch_status {
 
 const NotifyDispatchStatus NOTIFY_DISPATCH_DONE = 0;
 const NotifyDispatchStatus NOTIFY_DISPATCH_ALL_CLOSED = 1;
+const NotifyDispatchStatus NOTIFY_DISPATCH_NOT_CONNECTED = 2;
 
 const int NOTIFY_SESSION_NO_TIMEOUT = -1;
 
 NotifyDispatchStatus notify_session_dispatch(NotifySession s, int timeout) {
 	DBusMessage *msg;
+
+	if (s->conn && !dbus_connection_get_is_connected(s->conn))
+		notify_session_disconnect(s);
+	if (!s->conn)
+		return NOTIFY_DISPATCH_NOT_CONNECTED;
 
 	dbus_connection_read_write_dispatch(s->conn, timeout);
 	while ((msg = dbus_connection_pop_message(s->conn)))
