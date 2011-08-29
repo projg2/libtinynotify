@@ -167,16 +167,10 @@ static void _emit_closed(NotifySession s, Notification n, unsigned char reason) 
 	assert("reached if _emit_closed() fails to remove the notification");
 }
 
-static DBusHandlerResult _notify_session_handle_close(
-		DBusConnection *dbus_conn,
-		DBusMessage *msg,
-		void *session) {
-	NotifySession s = session;
-
-	if (dbus_message_get_type(msg) != DBUS_MESSAGE_TYPE_SIGNAL 
-			|| strcmp(dbus_message_get_interface(msg),
-				"org.freedesktop.Notifications"))
-		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+static void _notify_session_handle_message(DBusMessage *msg, NotifySession s) {
+	assert(dbus_message_get_type(msg) == DBUS_MESSAGE_TYPE_SIGNAL);
+	assert(!strcmp(dbus_message_get_interface(msg),
+				"org.freedesktop.Notifications"));
 
 	if (!strcmp(dbus_message_get_member(msg), "NotificationClosed")) {
 		DBusError err;
@@ -202,8 +196,6 @@ static DBusHandlerResult _notify_session_handle_close(
 		}
 	} else
 		assert("reached when invalid signal is received");
-
-	return DBUS_HANDLER_RESULT_HANDLED;
 }
 
 static void _notify_session_add_notification(NotifySession s, Notification n) {
@@ -217,9 +209,6 @@ static void _notify_session_add_notification(NotifySession s, Notification n) {
 
 	if (!s->notifications) { /* add the filter */
 		DBusError err;
-
-		_mem_assert(dbus_connection_add_filter(s->conn,
-					_notify_session_handle_close, s, NULL));
 
 		dbus_error_init(&err);
 		dbus_bus_add_match(s->conn, "type='signal',"
@@ -610,10 +599,11 @@ const NotifyDispatchStatus NOTIFY_DISPATCH_DONE = NULL;
 const int NOTIFY_SESSION_NO_TIMEOUT = -1;
 
 NotifyDispatchStatus notify_session_dispatch(NotifySession s, int timeout) {
+	DBusMessage *msg;
+
 	dbus_connection_read_write_dispatch(s->conn, timeout);
-#if 0 /* XXX? */
-	assert(!dbus_connection_pop_message(s->conn));
-#endif
+	while ((msg = dbus_connection_pop_message(s->conn)))
+		_notify_session_handle_message(msg, s);
 
 	return NOTIFY_DISPATCH_DONE;
 }
