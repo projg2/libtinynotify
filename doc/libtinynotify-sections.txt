@@ -50,6 +50,9 @@ notification_set_body
 <SECTION>
 <FILE>NotifyEvent</FILE>
 NOTIFICATION_CLOSED_BY_DISCONNECT
+NOTIFICATION_CLOSED_BY_CALLER
+NOTIFICATION_CLOSED_BY_EXPIRATION
+NOTIFICATION_CLOSED_BY_USER
 NotificationCloseCallback
 notification_bind_close_callback
 NotifyDispatchStatus

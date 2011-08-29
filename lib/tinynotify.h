@@ -591,6 +591,30 @@ void notification_set_body(Notification notification, const char* body);
 extern const unsigned char NOTIFICATION_CLOSED_BY_DISCONNECT;
 
 /**
+ * NOTIFICATION_CLOSED_BY_EXPIRATION
+ *
+ * A constant passed to #NotificationCloseCallback when the notification was
+ * closed because of the expiration timeout.
+ */
+extern const unsigned char NOTIFICATION_CLOSED_BY_EXPIRATION;
+
+/**
+ * NOTIFICATION_CLOSED_BY_USER
+ *
+ * A constant passed to #NotificationCloseCallback when the notification was
+ * closed because of the user action.
+ */
+extern const unsigned char NOTIFICATION_CLOSED_BY_USER;
+
+/**
+ * NOTIFICATION_CLOSED_BY_CALLER
+ *
+ * A constant passed to #NotificationCloseCallback when the notification was
+ * closed by a call to notification_close().
+ */
+extern const unsigned char NOTIFICATION_CLOSED_BY_CALLER;
+
+/**
  * NotificationCloseCallback
  * @notification: the notification which was closed
  * @close_reason: reason for which the notification was closed

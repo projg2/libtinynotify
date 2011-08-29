@@ -188,8 +188,23 @@ static void _notify_session_handle_message(DBusMessage *msg, NotifySession s) {
 
 			for (nl = s->notifications; nl; nl = nl->next) {
 				if (nl->n->message_id == id) {
-					/* XXX: reason */
-					_emit_closed(s, nl->n, 0);
+					unsigned char r;
+
+					switch (reason) {
+						case 1:
+							r = NOTIFICATION_CLOSED_BY_EXPIRATION;
+							break;
+						case 2:
+							r = NOTIFICATION_CLOSED_BY_USER;
+							break;
+						case 3:
+							r = NOTIFICATION_CLOSED_BY_CALLER;
+							break;
+						default:
+							r = 0;
+					}
+
+					_emit_closed(s, nl->n, r);
 					break;
 				}
 			}
@@ -588,6 +603,9 @@ void notification_set_body(Notification n, const char* body) {
 }
 
 const unsigned char NOTIFICATION_CLOSED_BY_DISCONNECT = 'D';
+const unsigned char NOTIFICATION_CLOSED_BY_EXPIRATION = 'E';
+const unsigned char NOTIFICATION_CLOSED_BY_USER = 'U';
+const unsigned char NOTIFICATION_CLOSED_BY_CALLER = 'C';
 
 void notification_bind_close_callback(Notification n,
 		NotificationCloseCallback callback, void* user_data) {
