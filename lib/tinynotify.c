@@ -148,21 +148,6 @@ NotifyError notify_session_connect(NotifySession s) {
 	return notify_session_set_error(s, NOTIFY_ERROR_NO_ERROR);
 }
 
-static void _notify_session_add_notification(NotifySession s, Notification n) {
-	struct _notification_list *nl;
-
-	for (nl = s->notifications; nl; nl = nl->next) {
-		/* XXX: maybe we should send some kind of close(reason = replaced)? */
-		if (nl->n == n)
-			return;
-	}
-
-	_mem_assert(nl = malloc(sizeof(*nl)));
-	nl->n = n;
-	nl->next = s->notifications;
-	s->notifications = nl;
-}
-
 static void _emit_closed(NotifySession s, Notification n, unsigned char reason) {
 	struct _notification_list **prev;
 
@@ -180,6 +165,73 @@ static void _emit_closed(NotifySession s, Notification n, unsigned char reason) 
 	}
 
 	assert("reached if _emit_closed() fails to remove the notification");
+}
+
+static DBusHandlerResult _notify_session_handle_close(
+		DBusConnection *dbus_conn,
+		DBusMessage *msg,
+		void *session) {
+	NotifySession s = session;
+
+	if (dbus_message_get_type(msg) != DBUS_MESSAGE_TYPE_SIGNAL 
+			|| strcmp(dbus_message_get_interface(msg),
+				"org.freedesktop.Notifications"))
+		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+
+	if (!strcmp(dbus_message_get_member(msg), "NotificationClosed")) {
+		DBusError err;
+		dbus_uint32_t id, reason;
+
+		dbus_error_init(&err);
+		if (!dbus_message_get_args(msg, &err,
+				DBUS_TYPE_UINT32, &id,
+				DBUS_TYPE_UINT32, &reason,
+				DBUS_TYPE_INVALID)) {
+			/* XXX: error handling? */
+			dbus_error_free(&err);
+		} else {
+			struct _notification_list *nl;
+
+			for (nl = s->notifications; nl; nl = nl->next) {
+				if (nl->n->message_id == id) {
+					/* XXX: reason */
+					_emit_closed(s, nl->n, 0);
+					break;
+				}
+			}
+		}
+	} else
+		assert("reached when invalid signal is received");
+
+	return DBUS_HANDLER_RESULT_HANDLED;
+}
+
+static void _notify_session_add_notification(NotifySession s, Notification n) {
+	struct _notification_list *nl;
+
+	for (nl = s->notifications; nl; nl = nl->next) {
+		/* XXX: maybe we should send some kind of close(reason = replaced)? */
+		if (nl->n == n)
+			return;
+	}
+
+	if (!s->notifications) { /* add the filter */
+		DBusError err;
+
+		_mem_assert(dbus_connection_add_filter(s->conn,
+					_notify_session_handle_close, s, NULL));
+
+		dbus_error_init(&err);
+		dbus_bus_add_match(s->conn, "type='signal',"
+				"interface='org.freedesktop.Notifications',"
+				"member='NotificationClosed'", &err);
+		_mem_assert(!dbus_error_is_set(&err));
+	}
+
+	_mem_assert(nl = malloc(sizeof(*nl)));
+	nl->n = n;
+	nl->next = s->notifications;
+	s->notifications = nl;
 }
 
 void notify_session_disconnect(NotifySession s) {
@@ -555,9 +607,13 @@ void notification_bind_close_callback(Notification n,
 }
 
 const NotifyDispatchStatus NOTIFY_DISPATCH_DONE = NULL;
-extern const int NOTIFY_SESSION_NO_TIMEOUT = -1;
+const int NOTIFY_SESSION_NO_TIMEOUT = -1;
 
-NotifyDispatchStatus notify_session_dispatch(NotifySession session,
-		int timeout) {
+NotifyDispatchStatus notify_session_dispatch(NotifySession s, int timeout) {
+	dbus_connection_read_write_dispatch(s->conn, timeout);
+#if 0 /* XXX? */
+	assert(!dbus_connection_pop_message(s->conn));
+#endif
+
 	return NOTIFY_DISPATCH_DONE;
 }
