@@ -578,6 +578,14 @@ void notification_set_body(Notification notification, const char* body);
  */
 
 /**
+ * NotifyCloseReason
+ *
+ * A reason for which the notification was closed.
+ */
+
+typedef unsigned char NotifyCloseReason;
+
+/**
  * NOTIFICATION_CLOSED_BY_DISCONNECT
  *
  * A constant passed to #NotificationCloseCallback when the close event is
@@ -588,7 +596,7 @@ void notification_set_body(Notification notification, const char* body);
  * the connection was interrupted. The notification may still be open, or be
  * long gone (if daemon failed to send the signal).
  */
-extern const unsigned char NOTIFICATION_CLOSED_BY_DISCONNECT;
+extern const NotifyCloseReason NOTIFICATION_CLOSED_BY_DISCONNECT;
 
 /**
  * NOTIFICATION_CLOSED_BY_EXPIRATION
@@ -596,7 +604,7 @@ extern const unsigned char NOTIFICATION_CLOSED_BY_DISCONNECT;
  * A constant passed to #NotificationCloseCallback when the notification was
  * closed because of the expiration timeout.
  */
-extern const unsigned char NOTIFICATION_CLOSED_BY_EXPIRATION;
+extern const NotifyCloseReason NOTIFICATION_CLOSED_BY_EXPIRATION;
 
 /**
  * NOTIFICATION_CLOSED_BY_USER
@@ -604,7 +612,7 @@ extern const unsigned char NOTIFICATION_CLOSED_BY_EXPIRATION;
  * A constant passed to #NotificationCloseCallback when the notification was
  * closed because of the user action.
  */
-extern const unsigned char NOTIFICATION_CLOSED_BY_USER;
+extern const NotifyCloseReason NOTIFICATION_CLOSED_BY_USER;
 
 /**
  * NOTIFICATION_CLOSED_BY_CALLER
@@ -612,7 +620,7 @@ extern const unsigned char NOTIFICATION_CLOSED_BY_USER;
  * A constant passed to #NotificationCloseCallback when the notification was
  * closed by a call to notification_close().
  */
-extern const unsigned char NOTIFICATION_CLOSED_BY_CALLER;
+extern const NotifyCloseReason NOTIFICATION_CLOSED_BY_CALLER;
 
 /**
  * NotificationCloseCallback
@@ -632,7 +640,7 @@ extern const unsigned char NOTIFICATION_CLOSED_BY_CALLER;
  * in this section. If it does so, one should assume the reason is unknown.
  */
 typedef void (*NotificationCloseCallback)(Notification notification,
-		unsigned char close_reason, void* user_data);
+		NotifyCloseReason close_reason, void* user_data);
 
 /**
  * notification_bind_close_callback

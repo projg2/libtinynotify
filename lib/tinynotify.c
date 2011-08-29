@@ -148,7 +148,7 @@ NotifyError notify_session_connect(NotifySession s) {
 	return notify_session_set_error(s, NOTIFY_ERROR_NO_ERROR);
 }
 
-static void _emit_closed(NotifySession s, Notification n, unsigned char reason) {
+static void _emit_closed(NotifySession s, Notification n, NotifyCloseReason reason) {
 	struct _notification_list **prev;
 
 	if (n->close_callback)
@@ -188,7 +188,7 @@ static void _notify_session_handle_message(DBusMessage *msg, NotifySession s) {
 
 			for (nl = s->notifications; nl; nl = nl->next) {
 				if (nl->n->message_id == id) {
-					unsigned char r;
+					NotifyCloseReason r;
 
 					switch (reason) {
 						case 1:
@@ -602,10 +602,10 @@ void notification_set_body(Notification n, const char* body) {
 	_property_assign_str(&n->body, body);
 }
 
-const unsigned char NOTIFICATION_CLOSED_BY_DISCONNECT = 'D';
-const unsigned char NOTIFICATION_CLOSED_BY_EXPIRATION = 'E';
-const unsigned char NOTIFICATION_CLOSED_BY_USER = 'U';
-const unsigned char NOTIFICATION_CLOSED_BY_CALLER = 'C';
+const NotifyCloseReason NOTIFICATION_CLOSED_BY_DISCONNECT = 'D';
+const NotifyCloseReason NOTIFICATION_CLOSED_BY_EXPIRATION = 'E';
+const NotifyCloseReason NOTIFICATION_CLOSED_BY_USER = 'U';
+const NotifyCloseReason NOTIFICATION_CLOSED_BY_CALLER = 'C';
 
 void notification_bind_close_callback(Notification n,
 		NotificationCloseCallback callback, void* user_data) {
