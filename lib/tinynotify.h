@@ -665,13 +665,26 @@ extern const NotificationCloseCallback NOTIFICATION_NOOP_ON_CLOSE;
 extern const NotificationCloseCallback NOTIFICATION_FREE_ON_CLOSE;
 
 /**
+ * NOTIFICATION_NO_CLOSE_CALLBACK
+ *
+ * A constant used to disable close callback.
+ */
+extern const NotificationCloseCallback NOTIFICATION_NO_CLOSE_CALLBACK;
+
+/**
  * notification_bind_close_callback
  * @notification: notification to operate on
- * @callback: new callback function, or %NULL to disable
+ * @callback: new callback function, or %NOTIFICATION_NO_CLOSE_CALLBACK
+ *	to disable
  * @user_data: additional user data to pass to the callback
  *
  * Bind a callback function which will be executed when notification is closed,
- * or remove a current binding (when @callback is %NULL).
+ * or remove a current binding (when @callback is
+ * %NOTIFICATION_NO_CLOSE_CALLBACK).
+ *
+ * A few standard callbacks are provided as well:
+ * - %NOTIFICATION_NOOP_ON_CLOSE,
+ * - %NOTIFICATION_FREE_ON_CLOSE.
  */
 void notification_bind_close_callback(Notification notification,
 		NotificationCloseCallback callback, void* user_data);
