@@ -595,7 +595,13 @@ void notification_bind_close_callback(Notification n,
 	n->close_data = user_data;
 }
 
-const NotifyDispatchStatus NOTIFY_DISPATCH_DONE = NULL;
+struct _notify_dispatch_status {
+	int dummy;
+};
+
+const NotifyDispatchStatus NOTIFY_DISPATCH_DONE = 0;
+const NotifyDispatchStatus NOTIFY_DISPATCH_ALL_CLOSED = 1;
+
 const int NOTIFY_SESSION_NO_TIMEOUT = -1;
 
 NotifyDispatchStatus notify_session_dispatch(NotifySession s, int timeout) {
@@ -605,5 +611,8 @@ NotifyDispatchStatus notify_session_dispatch(NotifySession s, int timeout) {
 	while ((msg = dbus_connection_pop_message(s->conn)))
 		_notify_session_handle_message(msg, s);
 
-	return NOTIFY_DISPATCH_DONE;
+	if (s->notifications)
+		return NOTIFY_DISPATCH_DONE;
+	else
+		return NOTIFY_DISPATCH_ALL_CLOSED;
 }

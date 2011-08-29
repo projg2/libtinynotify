@@ -631,7 +631,7 @@ void notification_bind_close_callback(Notification notification,
  * to evaluate to a false value. Thus, one can use #NotifyDispatchStatus
  * as a boolean.
  */
-typedef const struct _notify_dispatch_status* NotifyDispatchStatus;
+typedef const int NotifyDispatchStatus;
 
 /**
  * NOTIFY_DISPATCH_DONE
@@ -640,6 +640,15 @@ typedef const struct _notify_dispatch_status* NotifyDispatchStatus;
  * successfully, and there may be more messages to dispatch in the future.
  */
 extern const NotifyDispatchStatus NOTIFY_DISPATCH_DONE;
+
+/**
+ * NOTIFY_DISPATCH_ALL_CLOSED
+ *
+ * A constant denoting that the notify_session_dispatch() completed
+ * successfully, and doesn't expect any further events to come unless
+ * a new notification is sent (all notifications were closed).
+ */
+extern const NotifyDispatchStatus NOTIFY_DISPATCH_ALL_CLOSED;
 
 /**
  * NOTIFY_SESSION_NO_TIMEOUT
