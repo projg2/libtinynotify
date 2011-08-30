@@ -216,6 +216,12 @@ static void _notify_session_handle_message(DBusMessage *msg, NotifySession s) {
 static void _notify_session_add_notification(NotifySession s, Notification n) {
 	struct _notification_list *nl;
 
+	/* add the notification only when actually useful */
+	if (!n->close_callback) {
+		/* XXX: drop it from list if already there */
+		return;
+	}
+
 	for (nl = s->notifications; nl; nl = nl->next) {
 		/* XXX: maybe we should send some kind of close(reason = replaced)? */
 		if (nl->n == n)
