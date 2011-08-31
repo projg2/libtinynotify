@@ -621,6 +621,7 @@ static void _notification_free_on_close(Notification n, NotificationCloseReason 
 	notification_free(n);
 }
 
+const NotificationCloseCallback NOTIFICATION_NO_CLOSE_CALLBACK = NULL;
 const NotificationCloseCallback NOTIFICATION_NOOP_ON_CLOSE = _notification_noop_on_close;
 const NotificationCloseCallback NOTIFICATION_FREE_ON_CLOSE = _notification_free_on_close;
 
