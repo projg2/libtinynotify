@@ -1,4 +1,9 @@
 <SECTION>
+<FILE>NotifyFeatures</FILE>
+LIBTINYNOTIFY_HAS_EVENT_API
+LIBTINYNOTIFY_HAS_CLOSE_CALLBACK
+</SECTION>
+<SECTION>
 <FILE>NotifySession</FILE>
 NotifySession
 notify_session_new
