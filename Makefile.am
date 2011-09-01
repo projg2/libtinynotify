@@ -22,5 +22,6 @@ libtinynotify_la_LIBADD = $(DBUS_LIBS)
 libtinynotify_la_SOURCES = \
 	lib/common.c lib/common_.h \
 	lib/session.c lib/session_.h \
+	lib/notification_.h \
 	lib/tinynotify.c \
 	$(include_HEADERS) $(subinclude_HEADERS)
