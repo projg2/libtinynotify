@@ -1,36 +1,33 @@
-/* libtinynotify
+/* libtinynotify -- event-based API
  * (c) 2011 Michał Górny
  * 2-clause BSD-licensed
  */
 
 #include "config.h"
-#include "common_.h"
-#include "session_.h"
-#include "notification_.h"
 
 #include "error.h"
+#include "session.h"
 #include "notification.h"
 #include "event.h"
 
+#include "notification_.h"
+
 #include <stdlib.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <string.h>
 
-#include <assert.h>
-
-#include <dbus/dbus.h>
-
-#ifdef HAVE_LIBSTRL
-#	include <strl.h>
-#endif
-
-static const dbus_uint32_t NOTIFICATION_NO_NOTIFICATION_ID = 0;
+struct _notify_dispatch_status {
+	int dummy;
+};
 
 const NotificationCloseReason NOTIFICATION_CLOSED_BY_DISCONNECT = 'D';
 const NotificationCloseReason NOTIFICATION_CLOSED_BY_EXPIRATION = 'E';
 const NotificationCloseReason NOTIFICATION_CLOSED_BY_USER = 'U';
 const NotificationCloseReason NOTIFICATION_CLOSED_BY_CALLER = 'C';
+
+const NotifyDispatchStatus NOTIFY_DISPATCH_DONE = 0;
+const NotifyDispatchStatus NOTIFY_DISPATCH_ALL_CLOSED = 1;
+const NotifyDispatchStatus NOTIFY_DISPATCH_NOT_CONNECTED = 2;
+
+const int NOTIFY_SESSION_NO_TIMEOUT = -1;
 
 static void _notification_noop_on_close(Notification n, NotificationCloseReason r, void* user_data) {
 }
@@ -48,15 +45,3 @@ void notification_bind_close_callback(Notification n,
 	n->close_callback = callback;
 	n->close_data = user_data;
 }
-
-struct _notify_dispatch_status {
-	int dummy;
-};
-
-const NotifyDispatchStatus NOTIFY_DISPATCH_DONE = 0;
-const NotifyDispatchStatus NOTIFY_DISPATCH_ALL_CLOSED = 1;
-const NotifyDispatchStatus NOTIFY_DISPATCH_NOT_CONNECTED = 2;
-
-const int NOTIFY_SESSION_NO_TIMEOUT = -1;
-
-
