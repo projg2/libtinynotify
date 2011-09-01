@@ -101,19 +101,6 @@ const char* notify_session_get_error_message(NotifySession session);
 NotifyError notify_session_set_error(NotifySession session, NotifyError new_error, ...);
 
 /**
- * notify_session_disconnect
- * @session: session to operate on
- *
- * Drop the connection to the D-Bus session bus.
- *
- * Note that calling this function is not obligatory. It will be called
- * by notify_session_free() anyway.
- *
- * If no connection is established already, this function does nothing.
- */
-void notify_session_disconnect(NotifySession session);
-
-/**
  * notify_session_connect
  * @session: session to operate on
  *
@@ -131,6 +118,19 @@ void notify_session_disconnect(NotifySession session);
  * For additional error details, see notify_session_get_error_message().
  */
 NotifyError notify_session_connect(NotifySession session);
+
+/**
+ * notify_session_disconnect
+ * @session: session to operate on
+ *
+ * Drop the connection to the D-Bus session bus.
+ *
+ * Note that calling this function is not obligatory. It will be called
+ * by notify_session_free() anyway.
+ *
+ * If no connection is established already, this function does nothing.
+ */
+void notify_session_disconnect(NotifySession session);
 
 /**
  * NOTIFY_SESSION_NO_APP_NAME

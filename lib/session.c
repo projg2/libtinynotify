@@ -4,8 +4,15 @@
  */
 
 #include "config.h"
+
+#include "error.h"
+#include "session.h"
+#include "notification.h"
+#include "event.h"
+
 #include "common_.h"
 #include "session_.h"
+#include "notification_.h"
 
 #include <stdlib.h>
 #include <stdarg.h>
@@ -16,6 +23,71 @@
 #ifdef HAVE_LIBSTRL
 #	include <strl.h>
 #endif
+
+static void _emit_closed(NotifySession s, Notification n, NotificationCloseReason reason) {
+	struct _notification_list **prev;
+
+	if (n->close_callback)
+		n->close_callback(n, reason, n->close_data);
+
+	for (prev = &s->notifications; *prev; prev = &(*prev)->next) {
+		struct _notification_list *n_l = *prev;
+
+		if (n_l->n == n) {
+			*prev = n_l->next;
+			free(n_l);
+			return;
+		}
+	}
+
+	assert("reached if _emit_closed() fails to remove the notification");
+}
+
+static void _notify_session_handle_message(DBusMessage *msg, NotifySession s) {
+	assert(dbus_message_get_type(msg) == DBUS_MESSAGE_TYPE_SIGNAL);
+	assert(!strcmp(dbus_message_get_interface(msg),
+				"org.freedesktop.Notifications"));
+
+	if (!strcmp(dbus_message_get_member(msg), "NotificationClosed")) {
+		DBusError err;
+		dbus_uint32_t id, reason;
+
+		dbus_error_init(&err);
+		if (!dbus_message_get_args(msg, &err,
+				DBUS_TYPE_UINT32, &id,
+				DBUS_TYPE_UINT32, &reason,
+				DBUS_TYPE_INVALID)) {
+			/* XXX: error handling? */
+			dbus_error_free(&err);
+		} else {
+			struct _notification_list *nl;
+
+			for (nl = s->notifications; nl; nl = nl->next) {
+				if (nl->n->message_id == id) {
+					NotificationCloseReason r;
+
+					switch (reason) {
+						case 1:
+							r = NOTIFICATION_CLOSED_BY_EXPIRATION;
+							break;
+						case 2:
+							r = NOTIFICATION_CLOSED_BY_USER;
+							break;
+						case 3:
+							r = NOTIFICATION_CLOSED_BY_CALLER;
+							break;
+						default:
+							r = 0;
+					}
+
+					_emit_closed(s, nl->n, r);
+					break;
+				}
+			}
+		}
+	} else
+		assert("reached when invalid signal is received");
+}
 
 NotifySession notify_session_new(const char* app_name, const char* app_icon) {
 	NotifySession s;
@@ -68,4 +140,59 @@ NotifyError notify_session_set_error(NotifySession s, NotifyError new_error, ...
 	}
 
 	return new_error;
+}
+
+NotifyError notify_session_connect(NotifySession s) {
+	if (s->conn && !dbus_connection_get_is_connected(s->conn))
+		notify_session_disconnect(s);
+
+	if (!s->conn) {
+		DBusError err;
+
+		dbus_error_init(&err);
+		s->conn = dbus_bus_get_private(DBUS_BUS_SESSION, &err);
+
+		assert(!s->conn == dbus_error_is_set(&err));
+		if (!s->conn) {
+			char *err_msg = strdup(err.message);
+			dbus_error_free(&err);
+			return notify_session_set_error(s, NOTIFY_ERROR_DBUS_CONNECT, err_msg);
+		} else
+			dbus_connection_set_exit_on_disconnect(s->conn, FALSE);
+	}
+
+	return notify_session_set_error(s, NOTIFY_ERROR_NO_ERROR);
+}
+
+void notify_session_disconnect(NotifySession s) {
+	if (s->conn) {
+		struct _notification_list **n = &s->notifications;
+
+		while (*n)
+			_emit_closed(s, (*n)->n, NOTIFICATION_CLOSED_BY_DISCONNECT);
+
+		dbus_connection_close(s->conn);
+		dbus_connection_unref(s->conn);
+		s->conn = NULL;
+	}
+
+	notify_session_set_error(s, NOTIFY_ERROR_NO_ERROR);
+}
+
+NotifyDispatchStatus notify_session_dispatch(NotifySession s, int timeout) {
+	DBusMessage *msg;
+
+	if (s->conn && !dbus_connection_get_is_connected(s->conn))
+		notify_session_disconnect(s);
+	if (!s->conn)
+		return NOTIFY_DISPATCH_NOT_CONNECTED;
+
+	dbus_connection_read_write_dispatch(s->conn, timeout);
+	while ((msg = dbus_connection_pop_message(s->conn)))
+		_notify_session_handle_message(msg, s);
+
+	if (s->notifications)
+		return NOTIFY_DISPATCH_DONE;
+	else
+		return NOTIFY_DISPATCH_ALL_CLOSED;
 }
