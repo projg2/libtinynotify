@@ -45,6 +45,11 @@ void _notification_event_init(Notification n) {
 	notification_bind_close_callback(n, NOTIFICATION_NO_CLOSE_CALLBACK, NULL);
 }
 
+void _emit_closed(Notification n, NotificationCloseReason reason) {
+	if (n->close_callback)
+		n->close_callback(n, reason, n->close_data);
+}
+
 void notification_bind_close_callback(Notification n,
 		NotificationCloseCallback callback, void* user_data) {
 	n->close_callback = callback;

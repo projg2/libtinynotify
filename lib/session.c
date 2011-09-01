@@ -13,6 +13,7 @@
 #include "common_.h"
 #include "session_.h"
 #include "notification_.h"
+#include "event_.h"
 
 #include <stdlib.h>
 #include <stdarg.h>
@@ -26,11 +27,6 @@
 
 const char* const NOTIFY_SESSION_NO_APP_NAME = NULL;
 const char* const NOTIFY_SESSION_NO_APP_ICON = NULL;
-
-static void _emit_closed(Notification n, NotificationCloseReason reason) {
-	if (n->close_callback)
-		n->close_callback(n, reason, n->close_data);
-}
 
 static void _notify_session_handle_message(DBusMessage *msg, NotifySession s) {
 	assert(dbus_message_get_type(msg) == DBUS_MESSAGE_TYPE_SIGNAL);
