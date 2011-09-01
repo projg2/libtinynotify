@@ -24,6 +24,9 @@
 #	include <strl.h>
 #endif
 
+const char* const NOTIFY_SESSION_NO_APP_NAME = NULL;
+const char* const NOTIFY_SESSION_NO_APP_ICON = NULL;
+
 static void _emit_closed(NotifySession s, Notification n, NotificationCloseReason reason) {
 	struct _notification_list **prev;
 
@@ -195,4 +198,12 @@ NotifyDispatchStatus notify_session_dispatch(NotifySession s, int timeout) {
 		return NOTIFY_DISPATCH_DONE;
 	else
 		return NOTIFY_DISPATCH_ALL_CLOSED;
+}
+
+void notify_session_set_app_name(NotifySession s, const char* app_name) {
+	_property_assign_str(&s->app_name, app_name);
+}
+
+void notify_session_set_app_icon(NotifySession s, const char* app_icon) {
+	_property_assign_str(&s->app_icon, app_icon);
 }

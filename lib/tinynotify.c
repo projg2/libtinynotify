@@ -67,18 +67,6 @@ static void _notify_session_add_notification(NotifySession s, Notification n) {
 	s->notifications = nl;
 }
 
-const char* const NOTIFY_SESSION_NO_APP_NAME = NULL;
-
-void notify_session_set_app_name(NotifySession s, const char* app_name) {
-	_property_assign_str(&s->app_name, app_name);
-}
-
-const char* const NOTIFY_SESSION_NO_APP_ICON = NULL;
-
-void notify_session_set_app_icon(NotifySession s, const char* app_icon) {
-	_property_assign_str(&s->app_icon, app_icon);
-}
-
 static const dbus_uint32_t NOTIFICATION_NO_NOTIFICATION_ID = 0;
 
 const char* const NOTIFICATION_NO_BODY = NULL;
