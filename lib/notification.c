@@ -65,3 +65,19 @@ void notification_free(Notification n) {
 		free(n->app_icon);
 	free(n);
 }
+
+void notification_set_app_icon(Notification n, const char* app_icon) {
+	_property_assign_str(&n->app_icon, app_icon);
+}
+
+void notification_set_expire_timeout(Notification n, int expire_timeout) {
+	n->expire_timeout = expire_timeout;
+}
+
+void notification_set_urgency(Notification n, short int urgency) {
+	n->urgency = urgency;
+}
+
+void notification_set_category(Notification n, const char* category) {
+	_property_assign_str(&n->category, category);
+}
