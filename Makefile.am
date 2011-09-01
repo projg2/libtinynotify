@@ -18,5 +18,7 @@ subinclude_HEADERS = \
 libtinynotify_la_LDFLAGS = -version-info 1:0:1
 libtinynotify_la_CPPFLAGS = $(DBUS_CFLAGS)
 libtinynotify_la_LIBADD = $(DBUS_LIBS)
-libtinynotify_la_SOURCES = lib/tinynotify.c \
+libtinynotify_la_SOURCES = \
+	lib/common.c lib/common_.h \
+	lib/tinynotify.c \
 	$(include_HEADERS) $(subinclude_HEADERS)

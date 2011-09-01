@@ -4,6 +4,8 @@
  */
 
 #include "config.h"
+#include "common_.h"
+
 #include "session.h"
 #include "notification.h"
 #include "event.h"
@@ -14,20 +16,12 @@
 #include <string.h>
 
 #include <assert.h>
-#define _mem_assert(x) _mem_check(!!(x))
 
 #include <dbus/dbus.h>
 
 #ifdef HAVE_LIBSTRL
 #	include <strl.h>
 #endif
-
-void _mem_check(int res) {
-	if (!res) {
-		fputs("Memory allocation failed.\n", stderr);
-		abort();
-	}
-}
 
 struct _notification_list {
 	Notification n;
