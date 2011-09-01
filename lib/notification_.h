@@ -12,6 +12,8 @@
 #include "notification.h"
 #include "event.h"
 
+#pragma GCC visibility push(hidden)
+
 struct _notification {
 	char* summary;
 	char* body;
@@ -29,4 +31,5 @@ struct _notification {
 	dbus_uint32_t message_id;
 };
 
+#pragma GCC visibility pop
 #endif /*_TINYNOTIFY_NOTIFICATION__H*/

@@ -13,6 +13,8 @@
 #include "session.h"
 #include "notification.h"
 
+#pragma GCC visibility push(hidden)
+
 struct _notification_list {
 	Notification n;
 	struct _notification_list* next;
@@ -34,4 +36,5 @@ struct _notify_session {
 void _notify_session_add_notification(NotifySession s, Notification n);
 void _notify_session_remove_notification(NotifySession s, Notification n);
 
+#pragma GCC visibility pop
 #endif /*_TINYNOTIFY_SESSION__H*/
