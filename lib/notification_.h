@@ -12,6 +12,7 @@
 #include "notification.h"
 #include "event.h"
 
+/*<private_header>*/
 #pragma GCC visibility push(hidden)
 
 struct _notification {

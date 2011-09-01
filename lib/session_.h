@@ -13,6 +13,7 @@
 #include "session.h"
 #include "notification.h"
 
+/*<private_header>*/
 #pragma GCC visibility push(hidden)
 
 struct _notification_list {

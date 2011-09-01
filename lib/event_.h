@@ -7,6 +7,7 @@
 #ifndef _TINYNOTIFY_EVENT__H
 #define _TINYNOTIFY_EVENT__H
 
+/*<private_header>*/
 #pragma GCC visibility push(hidden)
 
 void _notification_event_init(Notification n);

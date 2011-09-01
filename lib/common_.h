@@ -9,6 +9,7 @@
 
 #include <stdarg.h>
 
+/*<private_header>*/
 #pragma GCC visibility push(hidden)
 
 #define _mem_assert(x) _mem_check(!!(x))
