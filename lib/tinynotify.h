@@ -7,6 +7,7 @@
 #ifndef _TINYNOTIFY_H
 #define _TINYNOTIFY_H
 
+#include <tinynotify/error.h>
 #include <tinynotify/features.h>
 #include <tinynotify/session.h>
 #include <tinynotify/notification.h>

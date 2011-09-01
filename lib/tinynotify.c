@@ -6,6 +6,7 @@
 #include "config.h"
 #include "common_.h"
 
+#include "error.h"
 #include "session.h"
 #include "notification.h"
 #include "event.h"

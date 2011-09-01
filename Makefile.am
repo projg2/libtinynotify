@@ -11,6 +11,7 @@ pkgconfig_DATA = libtinynotify.pc
 include_HEADERS = lib/tinynotify.h
 subinclude_HEADERS = \
 	lib/features.h \
+	lib/error.h \
 	lib/session.h \
 	lib/notification.h \
 	lib/event.h
