@@ -3,6 +3,7 @@
  * 2-clause BSD-licensed
  */
 
+#pragma once
 #ifndef _TINYNOTIFY_EVENT_H
 #define _TINYNOTIFY_EVENT_H
 

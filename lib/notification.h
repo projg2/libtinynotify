@@ -3,6 +3,7 @@
  * 2-clause BSD-licensed
  */
 
+#pragma once
 #ifndef _TINYNOTIFY_NOTIFICATION_H
 #define _TINYNOTIFY_NOTIFICATION_H
 
