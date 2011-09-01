@@ -4,7 +4,9 @@
  */
 
 #include "config.h"
-#include "tinynotify.h"
+#include "session.h"
+#include "notification.h"
+#include "event.h"
 
 #include <stdlib.h>
 #include <stdio.h>
