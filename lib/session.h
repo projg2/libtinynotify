@@ -77,6 +77,16 @@ void notify_session_free(NotifySession session);
 NotifyError notify_session_get_error(NotifySession session);
 
 /**
+ * notify_session_get_error_message
+ * @session: session to operate on
+ *
+ * Get detailed error message for @session.
+ *
+ * Returns: a statically allocated or constant string (not to be freed)
+ */
+const char* notify_session_get_error_message(NotifySession session);
+
+/**
  * notify_session_set_error
  * @session: session to operate on
  * @new_error: new error code
@@ -89,16 +99,6 @@ NotifyError notify_session_get_error(NotifySession session);
  * Returns: same value as @new_error, for convenience.
  */
 NotifyError notify_session_set_error(NotifySession session, NotifyError new_error, ...);
-
-/**
- * notify_session_get_error_message
- * @session: session to operate on
- *
- * Get detailed error message for @session.
- *
- * Returns: a statically allocated or constant string (not to be freed)
- */
-const char* notify_session_get_error_message(NotifySession session);
 
 /**
  * notify_session_disconnect
