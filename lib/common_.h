@@ -10,5 +10,6 @@
 #define _mem_assert(x) _mem_check(!!(x))
 
 void _mem_check(int res);
+void _property_assign_str(char** prop, const char* newval);
 
 #endif /*_TINYNOTIFY_COMMON__H*/

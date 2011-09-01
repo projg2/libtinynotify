@@ -67,15 +67,6 @@ static void _notify_session_add_notification(NotifySession s, Notification n) {
 	s->notifications = nl;
 }
 
-static void _property_assign_str(char** prop, const char* newval) {
-	if (*prop)
-		free(*prop);
-	if (newval)
-		_mem_assert(*prop = strdup(newval));
-	else
-		*prop = NULL;
-}
-
 const char* const NOTIFY_SESSION_NO_APP_NAME = NULL;
 
 void notify_session_set_app_name(NotifySession s, const char* app_name) {
