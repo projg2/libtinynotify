@@ -28,53 +28,6 @@
 const char* const NOTIFY_SESSION_NO_APP_NAME = NULL;
 const char* const NOTIFY_SESSION_NO_APP_ICON = NULL;
 
-static void _notify_session_handle_message(DBusMessage *msg, NotifySession s) {
-	assert(dbus_message_get_type(msg) == DBUS_MESSAGE_TYPE_SIGNAL);
-	assert(!strcmp(dbus_message_get_interface(msg),
-				"org.freedesktop.Notifications"));
-
-	if (!strcmp(dbus_message_get_member(msg), "NotificationClosed")) {
-		DBusError err;
-		dbus_uint32_t id, reason;
-
-		dbus_error_init(&err);
-		if (!dbus_message_get_args(msg, &err,
-				DBUS_TYPE_UINT32, &id,
-				DBUS_TYPE_UINT32, &reason,
-				DBUS_TYPE_INVALID)) {
-			/* XXX: error handling? */
-			dbus_error_free(&err);
-		} else {
-			struct _notification_list *nl;
-
-			for (nl = s->notifications; nl; nl = nl->next) {
-				if (nl->n->message_id == id) {
-					NotificationCloseReason r;
-
-					switch (reason) {
-						case 1:
-							r = NOTIFICATION_CLOSED_BY_EXPIRATION;
-							break;
-						case 2:
-							r = NOTIFICATION_CLOSED_BY_USER;
-							break;
-						case 3:
-							r = NOTIFICATION_CLOSED_BY_CALLER;
-							break;
-						default:
-							r = 0;
-					}
-
-					_emit_closed(nl->n, r);
-					_notify_session_remove_notification(s, nl->n);
-					break;
-				}
-			}
-		}
-	} else
-		assert("reached when invalid signal is received");
-}
-
 void _notify_session_add_notification(NotifySession s, Notification n) {
 	struct _notification_list *nl;
 
@@ -215,24 +168,6 @@ void notify_session_disconnect(NotifySession s) {
 	}
 
 	notify_session_set_error(s, NOTIFY_ERROR_NO_ERROR);
-}
-
-NotifyDispatchStatus notify_session_dispatch(NotifySession s, int timeout) {
-	DBusMessage *msg;
-
-	if (s->conn && !dbus_connection_get_is_connected(s->conn))
-		notify_session_disconnect(s);
-	if (!s->conn)
-		return NOTIFY_DISPATCH_NOT_CONNECTED;
-
-	dbus_connection_read_write_dispatch(s->conn, timeout);
-	while ((msg = dbus_connection_pop_message(s->conn)))
-		_notify_session_handle_message(msg, s);
-
-	if (s->notifications)
-		return NOTIFY_DISPATCH_DONE;
-	else
-		return NOTIFY_DISPATCH_ALL_CLOSED;
 }
 
 void notify_session_set_app_name(NotifySession s, const char* app_name) {
