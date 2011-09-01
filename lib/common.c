@@ -12,6 +12,10 @@
 #include <string.h>
 #include <assert.h>
 
+#ifdef HAVE_LIBSTRL
+#	include <strl.h>
+#endif
+
 void _mem_check(int res) {
 	if (!res) {
 		fputs("Memory allocation failed.\n", stderr);
