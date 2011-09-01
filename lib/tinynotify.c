@@ -27,37 +27,6 @@
 
 static const dbus_uint32_t NOTIFICATION_NO_NOTIFICATION_ID = 0;
 
-static void _notify_session_add_notification(NotifySession s, Notification n) {
-	struct _notification_list *nl;
-
-	/* add the notification only when actually useful */
-	if (!n->close_callback) {
-		/* XXX: drop it from list if already there */
-		return;
-	}
-
-	for (nl = s->notifications; nl; nl = nl->next) {
-		/* XXX: maybe we should send some kind of close(reason = replaced)? */
-		if (nl->n == n)
-			return;
-	}
-
-	if (!s->notifications) { /* add the filter */
-		DBusError err;
-
-		dbus_error_init(&err);
-		dbus_bus_add_match(s->conn, "type='signal',"
-				"interface='org.freedesktop.Notifications',"
-				"member='NotificationClosed'", &err);
-		_mem_assert(!dbus_error_is_set(&err));
-	}
-
-	_mem_assert(nl = malloc(sizeof(*nl)));
-	nl->n = n;
-	nl->next = s->notifications;
-	s->notifications = nl;
-}
-
 #ifndef va_copy
 #	ifdef __va_copy
 #		define va_copy __va_copy

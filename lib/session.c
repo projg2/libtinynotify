@@ -92,6 +92,37 @@ static void _notify_session_handle_message(DBusMessage *msg, NotifySession s) {
 		assert("reached when invalid signal is received");
 }
 
+void _notify_session_add_notification(NotifySession s, Notification n) {
+	struct _notification_list *nl;
+
+	/* add the notification only when actually useful */
+	if (!n->close_callback) {
+		/* XXX: drop it from list if already there */
+		return;
+	}
+
+	for (nl = s->notifications; nl; nl = nl->next) {
+		/* XXX: maybe we should send some kind of close(reason = replaced)? */
+		if (nl->n == n)
+			return;
+	}
+
+	if (!s->notifications) { /* add the filter */
+		DBusError err;
+
+		dbus_error_init(&err);
+		dbus_bus_add_match(s->conn, "type='signal',"
+				"interface='org.freedesktop.Notifications',"
+				"member='NotificationClosed'", &err);
+		_mem_assert(!dbus_error_is_set(&err));
+	}
+
+	_mem_assert(nl = malloc(sizeof(*nl)));
+	nl->n = n;
+	nl->next = s->notifications;
+	s->notifications = nl;
+}
+
 NotifySession notify_session_new(const char* app_name, const char* app_icon) {
 	NotifySession s;
 

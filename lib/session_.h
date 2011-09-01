@@ -31,4 +31,6 @@ struct _notify_session {
 	struct _notification_list* notifications;
 };
 
+void _notify_session_add_notification(NotifySession s, Notification n);
+
 #endif /*_TINYNOTIFY_SESSION__H*/
