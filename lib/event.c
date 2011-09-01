@@ -11,6 +11,7 @@
 #include "event.h"
 
 #include "notification_.h"
+#include "event_.h"
 
 #include <stdlib.h>
 
@@ -39,6 +40,10 @@ static void _notification_free_on_close(Notification n, NotificationCloseReason 
 const NotificationCloseCallback NOTIFICATION_NO_CLOSE_CALLBACK = NULL;
 const NotificationCloseCallback NOTIFICATION_NOOP_ON_CLOSE = _notification_noop_on_close;
 const NotificationCloseCallback NOTIFICATION_FREE_ON_CLOSE = _notification_free_on_close;
+
+void _notification_event_init(Notification n) {
+	notification_bind_close_callback(n, NOTIFICATION_NO_CLOSE_CALLBACK, NULL);
+}
 
 void notification_bind_close_callback(Notification n,
 		NotificationCloseCallback callback, void* user_data) {

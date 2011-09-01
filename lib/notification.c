@@ -13,6 +13,7 @@
 #include "common_.h"
 #include "session_.h"
 #include "notification_.h"
+#include "event_.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -56,7 +57,7 @@ Notification notification_new_unformatted(const char* summary, const char* body)
 	notification_set_formatting(n, 0);
 	notification_set_expire_timeout(n, NOTIFICATION_DEFAULT_EXPIRE_TIMEOUT);
 	notification_set_urgency(n, NOTIFICATION_NO_URGENCY);
-	notification_bind_close_callback(n, NOTIFICATION_NO_CLOSE_CALLBACK, NULL);
+	_notification_event_init(n);
 	return n;
 }
 
