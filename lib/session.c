@@ -28,22 +28,10 @@ const char* const NOTIFY_SESSION_NO_APP_NAME = NULL;
 const char* const NOTIFY_SESSION_NO_APP_ICON = NULL;
 
 static void _emit_closed(NotifySession s, Notification n, NotificationCloseReason reason) {
-	struct _notification_list **prev;
-
 	if (n->close_callback)
 		n->close_callback(n, reason, n->close_data);
 
-	for (prev = &s->notifications; *prev; prev = &(*prev)->next) {
-		struct _notification_list *n_l = *prev;
-
-		if (n_l->n == n) {
-			*prev = n_l->next;
-			free(n_l);
-			return;
-		}
-	}
-
-	assert("reached if _emit_closed() fails to remove the notification");
+	_notify_session_remove_notification(s, n);
 }
 
 static void _notify_session_handle_message(DBusMessage *msg, NotifySession s) {
@@ -121,6 +109,22 @@ void _notify_session_add_notification(NotifySession s, Notification n) {
 	nl->n = n;
 	nl->next = s->notifications;
 	s->notifications = nl;
+}
+
+void _notify_session_remove_notification(NotifySession s, Notification n) {
+	struct _notification_list **prev;
+
+	for (prev = &s->notifications; *prev; prev = &(*prev)->next) {
+		struct _notification_list *n_l = *prev;
+
+		if (n_l->n == n) {
+			*prev = n_l->next;
+			free(n_l);
+			return;
+		}
+	}
+
+	assert("reached if _emit_closed() fails to remove the notification");
 }
 
 NotifySession notify_session_new(const char* app_name, const char* app_icon) {
