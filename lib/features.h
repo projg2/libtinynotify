@@ -22,16 +22,9 @@
  * LIBTINYNOTIFY_HAS_EVENT_API
  *
  * Denotes that libtinynotify has event API with notify_session_dispatch()
- * method and relevant types and constants.
+ * method and relevant types and constants. This also implies that it is
+ * capable of handling 'close' event.
  */
 #define LIBTINYNOTIFY_HAS_EVENT_API 1
-
-/**
- * LIBTINYNOTIFY_HAS_CLOSE_CALLBACK
- *
- * Denotes that libtinynotify has notification_bind_close_callback() function
- * along with relevant types and constants.
- */
-#define LIBTINYNOTIFY_HAS_CLOSE_CALLBACK 1
 
 #endif /*_TINYNOTIFY_FEATURES_H*/
