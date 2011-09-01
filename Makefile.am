@@ -23,6 +23,6 @@ libtinynotify_la_SOURCES = \
 	lib/common.c lib/common_.h \
 	lib/error.c \
 	lib/session.c lib/session_.h \
-	lib/notification_.h \
+	lib/notification.c lib/notification_.h \
 	lib/tinynotify.c \
 	$(include_HEADERS) $(subinclude_HEADERS)
