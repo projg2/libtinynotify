@@ -27,11 +27,9 @@
 const char* const NOTIFY_SESSION_NO_APP_NAME = NULL;
 const char* const NOTIFY_SESSION_NO_APP_ICON = NULL;
 
-static void _emit_closed(NotifySession s, Notification n, NotificationCloseReason reason) {
+static void _emit_closed(Notification n, NotificationCloseReason reason) {
 	if (n->close_callback)
 		n->close_callback(n, reason, n->close_data);
-
-	_notify_session_remove_notification(s, n);
 }
 
 static void _notify_session_handle_message(DBusMessage *msg, NotifySession s) {
@@ -71,7 +69,8 @@ static void _notify_session_handle_message(DBusMessage *msg, NotifySession s) {
 							r = 0;
 					}
 
-					_emit_closed(s, nl->n, r);
+					_emit_closed(nl->n, r);
+					_notify_session_remove_notification(s, nl->n);
 					break;
 				}
 			}
@@ -124,7 +123,7 @@ void _notify_session_remove_notification(NotifySession s, Notification n) {
 		}
 	}
 
-	assert("reached if _emit_closed() fails to remove the notification");
+	assert("reached if _notify_session_remove_notification() fails to find the notification");
 }
 
 NotifySession notify_session_new(const char* app_name, const char* app_icon) {
@@ -204,10 +203,15 @@ NotifyError notify_session_connect(NotifySession s) {
 
 void notify_session_disconnect(NotifySession s) {
 	if (s->conn) {
-		struct _notification_list **n = &s->notifications;
+		struct _notification_list *nl;
+		struct _notification_list *next;
 
-		while (*n)
-			_emit_closed(s, (*n)->n, NOTIFICATION_CLOSED_BY_DISCONNECT);
+		for (nl = s->notifications; nl; nl = next) {
+			next = nl->next;
+			_emit_closed(nl->n, NOTIFICATION_CLOSED_BY_DISCONNECT);
+			free(nl);
+		}
+		s->notifications = NULL;
 
 		dbus_connection_close(s->conn);
 		dbus_connection_unref(s->conn);
