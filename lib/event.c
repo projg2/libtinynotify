@@ -16,10 +16,15 @@
 #include "event_.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <assert.h>
 
 #include <dbus/dbus.h>
+
+#ifdef HAVE_LIBSTRL
+#	include <strl.h>
+#endif
 
 struct _notify_dispatch_status {
 	int dummy;
@@ -155,10 +160,10 @@ void notification_bind_action(Notification n,
 	struct _notification_action_list **al;
 	struct _notification_action_list *a;
 
-	assert(key);
+	assert(key || callback);
 
 	for (al = &n->actions; *al; al = &(*al)->next) {
-		if (!strcmp((*al)->key, key)) {
+		if (key && !strcmp((*al)->key, key)) {
 			free((*al)->desc);
 			break;
 		}
@@ -168,7 +173,11 @@ void notification_bind_action(Notification n,
 		if (!callback)
 			return;
 		_mem_assert(*al = malloc(sizeof(**al)));
-		(*al)->key = strdup(key);
+
+		if (!key) /* XXX: something nicer? */
+			_mem_assert(asprintf(&(*al)->key, "_%lx", (long int) *al) != -1);
+		else
+			(*al)->key = strdup(key);
 	}
 	a = *al;
 

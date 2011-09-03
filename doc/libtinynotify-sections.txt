@@ -66,6 +66,7 @@ notification_bind_close_callback
 NotificationActionCallback
 NOTIFICATION_NO_ACTION
 NOTIFICATION_DEFAULT_ACTION
+NOTIFICATION_AUTO_ACTION_KEY
 notification_bind_action
 NotifyDispatchStatus
 NOTIFY_DISPATCH_DONE
