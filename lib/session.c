@@ -32,7 +32,7 @@ void _notify_session_add_notification(NotifySession s, Notification n) {
 	struct _notification_list *nl;
 
 	/* add the notification only when actually useful */
-	if (!n->close_callback) {
+	if (!n->close_callback && !n->actions) {
 		/* XXX: drop it from list if already there */
 		return;
 	}
@@ -50,6 +50,10 @@ void _notify_session_add_notification(NotifySession s, Notification n) {
 		dbus_bus_add_match(s->conn, "type='signal',"
 				"interface='org.freedesktop.Notifications',"
 				"member='NotificationClosed'", &err);
+		_mem_assert(!dbus_error_is_set(&err));
+		dbus_bus_add_match(s->conn, "type='signal',"
+				"interface='org.freedesktop.Notifications',"
+				"member='ActionInvoked'", &err);
 		_mem_assert(!dbus_error_is_set(&err));
 	}
 

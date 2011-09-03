@@ -69,11 +69,14 @@ void _emit_closed(Notification n, NotificationCloseReason reason) {
 }
 
 static void _notify_session_handle_message(DBusMessage *msg, NotifySession s) {
+	const char *member;
+
 	assert(dbus_message_get_type(msg) == DBUS_MESSAGE_TYPE_SIGNAL);
 	assert(!strcmp(dbus_message_get_interface(msg),
 				"org.freedesktop.Notifications"));
 
-	if (!strcmp(dbus_message_get_member(msg), "NotificationClosed")) {
+	member = dbus_message_get_member(msg);
+	if (!strcmp(member, "NotificationClosed")) {
 		DBusError err;
 		dbus_uint32_t id, reason;
 
@@ -111,6 +114,8 @@ static void _notify_session_handle_message(DBusMessage *msg, NotifySession s) {
 				}
 			}
 		}
+	} else if (!strcmp(member, "ActionInvoked")) {
+		/* XXX */
 	} else
 		assert(!"reached when invalid signal is received");
 }
