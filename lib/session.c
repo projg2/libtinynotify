@@ -72,7 +72,7 @@ void _notify_session_remove_notification(NotifySession s, Notification n) {
 		}
 	}
 
-	assert("reached if _notify_session_remove_notification() fails to find the notification");
+	assert(!"reached if _notify_session_remove_notification() fails to find the notification");
 }
 
 NotifySession notify_session_new(const char* app_name, const char* app_icon) {

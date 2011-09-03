@@ -99,7 +99,7 @@ static void _notify_session_handle_message(DBusMessage *msg, NotifySession s) {
 			}
 		}
 	} else
-		assert("reached when invalid signal is received");
+		assert(!"reached when invalid signal is received");
 }
 
 void notification_bind_close_callback(Notification n,
