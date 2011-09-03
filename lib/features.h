@@ -27,4 +27,12 @@
  */
 #define LIBTINYNOTIFY_HAS_EVENT_API 1
 
+/*
+ * LIBTINYNOTIFY_HAS_ACTIONS
+ *
+ * Denotes that libtinynotify has support for actions; basically,
+ * notification_bind_action().
+ */
+#define LIBTINYNOTIFY_HAS_ACTIONS 1
+
 #endif /*_TINYNOTIFY_FEATURES_H*/
