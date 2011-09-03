@@ -138,6 +138,67 @@ void notification_bind_close_callback(Notification notification,
 		NotificationCloseCallback callback, void* user_data);
 
 /**
+ * NotificationActionCallback
+ * @notification: the notification which was closed
+ * @key: the key for invoked action
+ * @user_data: additional user data pointer as passed
+ *	to notification_bind_action()
+ *
+ * The callback for invoked action.
+ */
+typedef void (*NotificationActionCallback)(Notification notification,
+		const char* key, void* user_data);
+
+/**
+ * NOTIFICATION_DEFAULT_ACTION
+ *
+ * A special (reserved) action key which makes the passed action a default one.
+ * It corresponds to the `default` key reserved by the protocol.
+ *
+ * Note that the default action may be not be displayed as a regular action
+ * (i.e. with its description).
+ */
+extern const char* const NOTIFICATION_DEFAULT_ACTION;
+
+/**
+ * NOTIFICATION_NO_ACTION
+ *
+ * A constant for callback used to disable/remove action.
+ */
+extern const NotificationActionCallback NOTIFICATION_NO_ACTION;
+
+/**
+ * notification_bind_action
+ * @notification: notification to operate on
+ * @key: a key for the new (or replaced) action, or %NOTIFICATION_DEFAULT_ACTION
+ * @callback: a callback function, or %NOTIFICATION_NO_ACTION
+ * @user_data: user data to pass to the callback
+ * @description: human-readable action description
+ *
+ * Add an action to the notification and bind a callback function for it.
+ * The callback function will be executed whenever user invokes the particular
+ * action. Note that it may be called multiple times.
+ *
+ * The key must be unique per action. Special value %NOTIFICATION_DEFAULT_ACTION
+ * corresponds to the default action.
+ *
+ * Actions are sent to server in the order of adding them. If one calls
+ * notification_bind_action() again with the same key, the previous action will
+ * be replaced by the new one without changing its position.
+ *
+ * If one calls notification_bind_action() with @callback ==
+ * %NOTIFICATION_NO_ACTION, the existing action will be removed (if exists;
+ * otherwise nothing will happen). Afterwards, adding the same action again will
+ * move it to the end of action list.
+ *
+ * If @description is %NULL, it will default to @key. This is usually not a good
+ * idea.
+ */
+void notification_bind_action(Notification notification,
+		const char* key, NotificationActionCallback callback,
+		void* user_data, const char* description);
+
+/**
  * NotifyDispatchStatus
  *
  * A return value from notify_session_dispatch().
