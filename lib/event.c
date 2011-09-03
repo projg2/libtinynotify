@@ -70,52 +70,75 @@ void _emit_closed(Notification n, NotificationCloseReason reason) {
 
 static void _notify_session_handle_message(DBusMessage *msg, NotifySession s) {
 	const char *member;
+	int is_notification_closed;
 
 	assert(dbus_message_get_type(msg) == DBUS_MESSAGE_TYPE_SIGNAL);
 	assert(!strcmp(dbus_message_get_interface(msg),
 				"org.freedesktop.Notifications"));
 
 	member = dbus_message_get_member(msg);
-	if (!strcmp(member, "NotificationClosed")) {
+	is_notification_closed = !strcmp(member, "NotificationClosed");
+	if (is_notification_closed || !strcmp(member, "ActionInvoked")) {
 		DBusError err;
 		dbus_uint32_t id, reason;
+		const char *action;
+		int ret;
 
 		dbus_error_init(&err);
-		if (!dbus_message_get_args(msg, &err,
-				DBUS_TYPE_UINT32, &id,
-				DBUS_TYPE_UINT32, &reason,
-				DBUS_TYPE_INVALID)) {
+		if (is_notification_closed)
+			ret = dbus_message_get_args(msg, &err,
+					DBUS_TYPE_UINT32, &id,
+					DBUS_TYPE_UINT32, &reason,
+					DBUS_TYPE_INVALID);
+		else
+			ret = dbus_message_get_args(msg, &err,
+					DBUS_TYPE_UINT32, &id,
+					DBUS_TYPE_STRING, &action,
+					DBUS_TYPE_INVALID);
+
+		if (!ret) {
 			/* XXX: error handling? */
 			dbus_error_free(&err);
 		} else {
 			struct _notification_list *nl;
 
 			for (nl = s->notifications; nl; nl = nl->next) {
-				if (nl->n->message_id == id) {
-					NotificationCloseReason r;
+				Notification n = nl->n;
 
-					switch (reason) {
-						case 1:
-							r = NOTIFICATION_CLOSED_BY_EXPIRATION;
-							break;
-						case 2:
-							r = NOTIFICATION_CLOSED_BY_USER;
-							break;
-						case 3:
-							r = NOTIFICATION_CLOSED_BY_CALLER;
-							break;
-						default:
-							r = 0;
+				if (n->message_id == id) {
+					if (is_notification_closed) {
+						NotificationCloseReason r;
+
+						switch (reason) {
+							case 1:
+								r = NOTIFICATION_CLOSED_BY_EXPIRATION;
+								break;
+							case 2:
+								r = NOTIFICATION_CLOSED_BY_USER;
+								break;
+							case 3:
+								r = NOTIFICATION_CLOSED_BY_CALLER;
+								break;
+							default:
+								r = 0;
+						}
+
+						_emit_closed(n, r);
+						_notify_session_remove_notification(s, n);
+					} else {
+						struct _notification_action_list *al;
+
+						for (al = n->actions; al; al = al->next) {
+							if (!strcmp(al->key, action)) {
+								al->callback(n, al->key, al->callback_data);
+								break;
+							}
+						}
 					}
-
-					_emit_closed(nl->n, r);
-					_notify_session_remove_notification(s, nl->n);
 					break;
 				}
 			}
 		}
-	} else if (!strcmp(member, "ActionInvoked")) {
-		/* XXX */
 	} else
 		assert(!"reached when invalid signal is received");
 }
