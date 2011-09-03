@@ -52,6 +52,10 @@ const NotificationCloseCallback NOTIFICATION_NO_CLOSE_CALLBACK = NULL;
 const NotificationCloseCallback NOTIFICATION_NOOP_ON_CLOSE = _notification_noop_on_close;
 const NotificationCloseCallback NOTIFICATION_FREE_ON_CLOSE = _notification_free_on_close;
 
+const char* const NOTIFICATION_DEFAULT_ACTION = "default";
+const char* const NOTIFICATION_AUTO_ACTION_KEY = NULL;
+const NotificationActionCallback NOTIFICATION_NO_ACTION = NULL;
+
 void _notification_event_init(Notification n) {
 	notification_bind_close_callback(n, NOTIFICATION_NO_CLOSE_CALLBACK, NULL);
 	n->actions = NULL;
