@@ -10,6 +10,7 @@
 #include "notification.h"
 #include "event.h"
 
+#include "common_.h"
 #include "session_.h"
 #include "notification_.h"
 #include "event_.h"
@@ -48,6 +49,18 @@ const NotificationCloseCallback NOTIFICATION_FREE_ON_CLOSE = _notification_free_
 
 void _notification_event_init(Notification n) {
 	notification_bind_close_callback(n, NOTIFICATION_NO_CLOSE_CALLBACK, NULL);
+	n->actions = NULL;
+}
+
+void _notification_event_free(Notification n) {
+	struct _notification_action_list *al, *next;
+
+	for (al = n->actions; al; al = next) {
+		next = al->next;
+		free(al->key);
+		free(al->desc);
+		free(al);
+	}
 }
 
 void _emit_closed(Notification n, NotificationCloseReason reason) {
@@ -106,6 +119,44 @@ void notification_bind_close_callback(Notification n,
 		NotificationCloseCallback callback, void* user_data) {
 	n->close_callback = callback;
 	n->close_data = user_data;
+}
+
+void notification_bind_action(Notification n,
+		const char* key, NotificationActionCallback callback,
+		void* user_data, const char* description) {
+	struct _notification_action_list **al;
+	struct _notification_action_list *a;
+
+	assert(key);
+
+	for (al = &n->actions; *al; al = &(*al)->next) {
+		if (!strcmp((*al)->key, key)) {
+			free((*al)->desc);
+			break;
+		}
+	}
+
+	if (!*al) {
+		if (!callback)
+			return;
+		_mem_assert(*al = malloc(sizeof(**al)));
+		(*al)->key = strdup(key);
+	}
+	a = *al;
+
+	if (!callback) {
+		*al = a->next;
+		free(a->key);
+		free(a);
+		return;
+	}
+
+	if (description)
+		a->desc = strdup(description);
+	else
+		a->desc = strdup(key);
+	a->callback = callback;
+	a->callback_data = user_data;
 }
 
 NotifyDispatchStatus notify_session_dispatch(NotifySession s, int timeout) {

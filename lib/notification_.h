@@ -22,6 +22,7 @@ struct _notification {
 
 	NotificationCloseCallback close_callback;
 	void* close_data;
+	struct _notification_action_list* actions;
 
 	dbus_int32_t expire_timeout;
 	NotificationUrgency urgency;

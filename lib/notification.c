@@ -62,6 +62,7 @@ Notification notification_new_unformatted(const char* summary, const char* body)
 }
 
 void notification_free(Notification n) {
+	_notification_event_free(n);
 	free(n->summary);
 	if (n->body)
 		free(n->body);
