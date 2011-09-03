@@ -115,6 +115,7 @@ static NotifyError notification_update_va(Notification n, NotifySession s, va_li
 	NotifyError ret;
 	char *err_msg;
 	char *f_summary;
+	struct _notification_action_list *al;
 
 	DBusMessage *msg, *reply;
 	DBusMessageIter iter, subiter;
@@ -156,6 +157,12 @@ static NotifyError notification_update_va(Notification n, NotifySession s, va_li
 	/* actions */
 	_mem_assert(dbus_message_iter_open_container(&iter,
 				DBUS_TYPE_ARRAY, DBUS_TYPE_STRING_AS_STRING, &subiter));
+	for (al = n->actions; al; al = al->next) {
+		_mem_assert(dbus_message_iter_append_basic(&subiter,
+					DBUS_TYPE_STRING, &al->key));
+		_mem_assert(dbus_message_iter_append_basic(&subiter,
+					DBUS_TYPE_STRING, &al->desc));
+	}
 	_mem_assert(dbus_message_iter_close_container(&iter, &subiter));
 
 	/* hints */
