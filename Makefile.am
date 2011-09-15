@@ -26,3 +26,9 @@ libtinynotify_la_SOURCES = \
 	lib/notification.c lib/notification_.h \
 	lib/event.c lib/event_.h \
 	$(include_HEADERS) $(subinclude_HEADERS)
+
+EXTRA_DIST = NEWS
+NEWS: configure.ac Makefile.am
+	git for-each-ref refs/tags --sort '-*committerdate' \
+		--format '# %(tag) (%(*committerdate:short))%0a%(contents:body)' \
+		> NEWS
