@@ -195,7 +195,7 @@ void notification_bind_action(Notification n,
 	if (description)
 		a->desc = strdup(description);
 	else
-		a->desc = strdup(key);
+		a->desc = strdup(a->key);
 	a->callback = callback;
 	a->callback_data = user_data;
 }
