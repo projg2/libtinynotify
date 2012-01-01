@@ -182,6 +182,7 @@ void notification_bind_action(Notification n,
 			_mem_assert(asprintf(&(*al)->key, "_%lx", (long int) *al) != -1);
 		else
 			(*al)->key = strdup(key);
+		(*al)->next = NULL;
 	}
 	a = *al;
 
