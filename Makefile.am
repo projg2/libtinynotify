@@ -16,7 +16,7 @@ subinclude_HEADERS = \
 	lib/notification.h \
 	lib/event.h
 
-libtinynotify_la_LDFLAGS = -version-info 2:0:2
+libtinynotify_la_LDFLAGS = -version-info 2:1:2
 libtinynotify_la_CPPFLAGS = $(DBUS_CFLAGS)
 libtinynotify_la_LIBADD = $(DBUS_LIBS)
 libtinynotify_la_SOURCES = \
