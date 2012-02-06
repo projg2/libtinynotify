@@ -21,6 +21,10 @@
 
 #include <dbus/dbus.h>
 
+#ifndef DBUS_TIMEOUT_INFINITE /* dbus < 1.4.12 */
+#	define DBUS_TIMEOUT_INFINITE 0x7fffffff
+#endif
+
 const char* const NOTIFICATION_NO_BODY = NULL;
 
 const char* const NOTIFICATION_DEFAULT_APP_ICON = NULL;
